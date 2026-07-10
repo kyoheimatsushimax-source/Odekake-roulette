@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>週末おでかけルーレット | 江東区エリア</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#E9F3F6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="おでかけ">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#E9F3F6;
+    --card:#FFFFFF;
+    --ink:#1E3A50;
+    --ink-soft:#5A7186;
+    --sun:#FFB531;
+    --leaf:#3E9B63;
+    --coral:#EF6461;
+    --pinkish:#F5A3C0;
+    --water:#BCDEE8;
+    --water-deep:#8FC3D6;
+    --land:#E8F2DB;
+    --land-line:#CBDFB4;
+    --indigo:#5B6ABF;
+    --orange:#F49D37;
+    --line:#D8E6EC;
+    --radius:20px;
+    --shadow:0 4px 14px rgba(30,58,80,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Zen Maru Gothic','Hiragino Maru Gothic ProN','Yu Gothic','Meiryo',sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 14px calc(60px + env(safe-area-inset-bottom))}
+
+  /* ---------- ヘッダー ---------- */
+  header{text-align:center;padding:14px 0 6px}
+  .kicker{
+    display:inline-block;font-size:11px;font-weight:700;letter-spacing:.18em;
+    color:var(--ink-soft);background:var(--card);border:1.5px solid var(--line);
+    border-radius:999px;padding:3px 14px;margin-bottom:8px;
+  }
+  h1{font-size:clamp(24px,6vw,32px);font-weight:900;letter-spacing:.04em;line-height:1.3}
+  h1 .accent{color:var(--coral)}
+  .subtitle{font-size:12.5px;color:var(--ink-soft);margin-top:4px}
+
+  /* ---------- タブ ---------- */
+  .tabs{
+    display:flex;gap:6px;background:var(--card);border:1.5px solid var(--line);
+    border-radius:999px;padding:5px;margin:16px 0 14px;box-shadow:var(--shadow);
+    position:sticky;top:calc(8px + env(safe-area-inset-top));z-index:50;
+  }
+  .tab{
+    flex:1;border:none;background:transparent;font-family:inherit;font-weight:700;
+    font-size:13.5px;color:var(--ink-soft);padding:9px 4px;border-radius:999px;
+    cursor:pointer;transition:background .2s,color .2s;
+  }
+  .tab[aria-selected="true"]{background:var(--ink);color:#fff}
+  .tab:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+
+  .panel{display:none}
+  .panel.active{display:block;animation:fadein .25s ease}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .card{
+    background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:18px 16px;margin-bottom:14px;
+  }
+  .card h2{font-size:15px;font-weight:900;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .card h2 .tag{font-size:10.5px;font-weight:700;color:var(--ink-soft);background:var(--bg);border-radius:999px;padding:2px 10px}
+
+  /* ---------- フィルタ ---------- */
+  .filter-group{margin-bottom:12px}
+  .filter-label{font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:6px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{
+    font-family:inherit;font-size:13px;font-weight:700;color:var(--ink);
+    background:var(--bg);border:1.5px solid var(--line);border-radius:999px;
+    padding:7px 14px;cursor:pointer;transition:all .15s;
+  }
+  .chip[aria-pressed="true"]{background:var(--sun);border-color:var(--sun);color:#5A3B00}
+  .chip.weather[aria-pressed="true"]{background:var(--water-deep);border-color:var(--water-deep);color:#0E3B4E}
+  .chip:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+  .count-note{font-size:12.5px;font-weight:700;color:var(--leaf);margin-top:2px}
+  .count-note.zero{color:var(--coral)}
+
+  /* ---------- ルーレット(観覧車風) ---------- */
+  .wheel-area{position:relative;width:min(320px,86vw);margin:6px auto 4px}
+  .wheel-svg{width:100%;height:auto;display:block}
+  #wheelGroup{transition:transform 4.4s cubic-bezier(.12,.72,.13,1)}
+  .hub-btn{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:88px;height:88px;border-radius:50%;border:4px solid #fff;
+    background:var(--coral);color:#fff;font-family:inherit;font-weight:900;
+    font-size:16px;letter-spacing:.08em;cursor:pointer;
+    box-shadow:0 3px 10px rgba(239,100,97,.45);
+    transition:transform .15s;
+  }
+  .hub-btn:hover{transform:translate(-50%,-50%) scale(1.06)}
+  .hub-btn:disabled{background:#B7C4CE;box-shadow:none;cursor:default;transform:translate(-50%,-50%)}
+  .hub-btn:focus-visible{outline:3px solid var(--sun);outline-offset:3px}
+  .wheel-note{text-align:center;font-size:11.5px;color:var(--ink-soft)}
+
+  /* ---------- 結果カード ---------- */
+  .result-card{
+    border:2.5px solid var(--sun);position:relative;overflow:hidden;display:none;
+  }
+  .result-card.show{display:block;animation:pop .35s cubic-bezier(.2,1.4,.4,1)}
+  @keyframes pop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+  .result-eyebrow{font-size:11px;font-weight:900;letter-spacing:.2em;color:var(--coral)}
+  .result-name{font-size:22px;font-weight:900;margin:2px 0 4px}
+  .result-name .emoji{font-size:26px;margin-right:6px}
+  .badges{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+  .badge{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 11px;background:var(--bg);color:var(--ink-soft)}
+  .badge.b-in{background:#E4E7F8;color:var(--indigo)}
+  .badge.b-out{background:#E4F3E8;color:var(--leaf)}
+  .badge.b-budget{background:#FFF0D2;color:#8A5B00}
+  .result-desc{font-size:13.5px;color:var(--ink);margin-bottom:12px}
+  .btn-row{display:flex;flex-wrap:wrap;gap:8px}
+  .btn{
+    font-family:inherit;font-weight:800;font-size:13.5px;border-radius:999px;
+    padding:10px 18px;cursor:pointer;border:none;transition:transform .12s,opacity .15s;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn-primary{background:var(--leaf);color:#fff}
+  .btn-ghost{background:var(--bg);color:var(--ink);border:1.5px solid var(--line)}
+  .btn-danger{background:none;border:none;color:var(--coral);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+  .btn:focus-visible,.btn-danger:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+  a.btn{text-decoration:none;display:inline-block}
+
+  /* ---------- 記録フォーム ---------- */
+  .record-form{display:none;background:var(--bg);border-radius:14px;padding:14px;margin-top:12px}
+  .record-form.show{display:block}
+  .record-form label{font-size:12px;font-weight:700;color:var(--ink-soft);display:block;margin:8px 0 3px}
+  .record-form input[type=date],.record-form input[type=text]{
+    width:100%;font-family:inherit;font-size:14px;padding:9px 12px;
+    border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);
+  }
+  .rating-row{display:flex;gap:7px}
+  .rating-row .chip{padding:6px 12px}
+
+  /* ---------- マップ ---------- */
+  .map-holder{border-radius:16px;overflow:hidden;border:1.5px solid var(--line)}
+  .map-holder svg{display:block;width:100%;height:auto}
+  .pin{cursor:pointer}
+  .pin circle.dot{stroke:#fff;stroke-width:2;transition:r .15s}
+  .pin:hover circle.dot{r:12}
+  .pin.dim{opacity:.22}
+  .pin.selected circle.halo{animation:pulse 1.4s ease-out infinite}
+  @keyframes pulse{0%{r:10;opacity:.7}100%{r:26;opacity:0}}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:11.5px;font-weight:700;color:var(--ink-soft)}
+  .legend span{display:flex;align-items:center;gap:5px}
+  .legend i{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .map-info{display:none;margin-top:12px;background:var(--bg);border-radius:14px;padding:14px}
+  .map-info.show{display:block;animation:fadein .2s ease}
+  .map-info .result-name{font-size:17px}
+
+  /* ---------- 記録一覧 ---------- */
+  .stats-row{display:flex;gap:10px;margin-bottom:14px}
+  .stat{
+    flex:1;background:var(--bg);border-radius:14px;padding:12px;text-align:center;
+  }
+  .stat .num{font-size:24px;font-weight:900;color:var(--leaf)}
+  .stat .lab{font-size:11px;font-weight:700;color:var(--ink-soft)}
+  .visit-item{
+    display:flex;gap:10px;align-items:flex-start;padding:12px 4px;
+    border-bottom:1.5px dashed var(--line);
+  }
+  .visit-item:last-child{border-bottom:none}
+  .visit-emoji{font-size:24px;line-height:1.3}
+  .visit-body{flex:1;min-width:0}
+  .visit-name{font-weight:900;font-size:14px}
+  .visit-meta{font-size:11.5px;color:var(--ink-soft)}
+  .visit-memo{font-size:12.5px;margin-top:2px;overflow-wrap:break-word}
+  .empty-note{text-align:center;color:var(--ink-soft);font-size:13px;padding:22px 0}
+
+  /* ---------- 紙吹雪 ---------- */
+  .confetti{position:fixed;top:-14px;width:9px;height:14px;border-radius:2px;z-index:999;pointer-events:none;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.8}}
+
+  footer{text-align:center;font-size:11px;color:var(--ink-soft);margin-top:8px}
+
+  @media (prefers-reduced-motion:reduce){
+    #wheelGroup{transition:transform .6s ease-out}
+    .confetti{display:none}
+    .pin.selected circle.halo{animation:none;opacity:.4}
+  }
+  @media(min-width:640px){
+    .wrap{padding-top:24px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="kicker">KOTO AREA FAMILY GUIDE</span>
+    <h1>週末おでかけ<span class="accent">ルーレット</span></h1>
+    <p class="subtitle">江東区とそのまわりの子連れスポットを、運まかせでひとつ提案</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-panel="panel-roulette">🎡 ルーレット</button>
+    <button class="tab" role="tab" aria-selected="false" data-panel="panel-map">🗺️ マップ</button>
+    <button class="tab" role="tab" aria-selected="false" data-panel="panel-log">📖 きろく</button>
+  </div>
+
+  <!-- ============ ルーレット ============ -->
+  <section id="panel-roulette" class="panel active">
+    <div class="card">
+      <h2>きょうの条件 <span class="tag">しぼりこみ</span></h2>
+
+      <div class="filter-group">
+        <div class="filter-label">☁️ お天気</div>
+        <div class="chips" id="weatherChips">
+          <button class="chip weather" data-weather="any" aria-pressed="true">☀️ 外でもOK</button>
+          <button class="chip weather" data-weather="indoor" aria-pressed="false">☔ 雨でも安心（屋内）</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-label">🎈 子どもの年齢（複数えらべます）</div>
+        <div class="chips" id="ageChips">
+          <button class="chip" data-age="0" aria-pressed="true">0〜2歳</button>
+          <button class="chip" data-age="1" aria-pressed="true">3〜5歳</button>
+          <button class="chip" data-age="2" aria-pressed="false">6歳以上</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-label">💰 予算の上限（家族での目安）</div>
+        <div class="chips" id="budgetChips">
+          <button class="chip" data-budget="3" aria-pressed="true">きにしない</button>
+          <button class="chip" data-budget="0" aria-pressed="false">無料</button>
+          <button class="chip" data-budget="1" aria-pressed="false">〜1,000円</button>
+          <button class="chip" data-budget="2" aria-pressed="false">〜3,000円</button>
+        </div>
+      </div>
+
+      <div class="count-note" id="countNote"></div>
+    </div>
+
+    <div class="card" style="padding-bottom:10px">
+      <div class="wheel-area">
+        <svg class="wheel-svg" viewBox="0 0 300 316" aria-hidden="true">
+          <!-- ポインター -->
+          <path d="M150,26 L138,4 L162,4 Z" fill="var(--coral)" stroke="#fff" stroke-width="2.5" transform="translate(0,0)"/>
+          <g transform="translate(0,16)">
+            <circle cx="150" cy="150" r="146" fill="#fff" stroke="var(--line)" stroke-width="2"/>
+            <g id="wheelGroup" style="transform-origin:150px 150px"></g>
+            <!-- 観覧車の電飾風リムドット -->
+            <g id="rimDots"></g>
+            <circle cx="150" cy="150" r="40" fill="#fff" stroke="var(--line)" stroke-width="2"/>
+          </g>
+        </svg>
+        <button class="hub-btn" id="spinBtn">まわす！</button>
+      </div>
+      <p class="wheel-note" id="wheelNote"></p>
+    </div>
+
+    <div class="card result-card" id="resultCard">
+      <div class="result-eyebrow">きょうのおでかけ先は…</div>
+      <div class="result-name" id="resName"></div>
+      <div class="badges" id="resBadges"></div>
+      <p class="result-desc" id="resDesc"></p>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="openRecordBtn">📖 行った記録をつける</button>
+        <a class="btn btn-ghost" id="gmapLink" href="#" target="_blank" rel="noopener">Googleマップで開く</a>
+        <button class="btn btn-ghost" id="showOnMapBtn">マップで見る</button>
+      </div>
+      <div class="record-form" id="recordForm">
+        <label for="recDate">行った日</label>
+        <input type="date" id="recDate">
+        <label>たのしさ</label>
+        <div class="rating-row" id="ratingRow">
+          <button class="chip" data-rate="😆" aria-pressed="true">😆 さいこう</button>
+          <button class="chip" data-rate="😊" aria-pressed="false">😊 たのしかった</button>
+          <button class="chip" data-rate="😐" aria-pressed="false">😐 ふつう</button>
+        </div>
+        <label for="recMemo">メモ（にがてだった・また行きたい など）</label>
+        <input type="text" id="recMemo" maxlength="120" placeholder="じゃぶじゃぶ池が大ヒット！">
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn btn-primary" id="saveRecordBtn">保存する</button>
+          <button class="btn btn-ghost" id="cancelRecordBtn">やめる</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ マップ ============ -->
+  <section id="panel-map" class="panel">
+    <div class="card">
+      <h2>おでかけマップ <span class="tag">かんたんイラスト地図</span></h2>
+      <div class="map-holder">
+        <svg id="mapSvg" viewBox="0 0 600 600" role="img" aria-label="江東区周辺のスポットマップ">
+          <rect width="600" height="600" fill="var(--water)"/>
+          <!-- 墨田・江東の陸地 -->
+          <path d="M0,0 H338 C346,60 350,120 352,180 C354,250 352,320 346,400
+                   C330,418 310,428 292,432 C288,470 288,520 284,556 C276,562 262,562 256,556
+                   C254,516 254,472 250,438 C222,446 190,448 158,440 C130,433 108,420 90,404
+                   C96,388 104,376 96,364 C70,368 44,362 20,428 C12,436 0,438 0,438 Z"
+                fill="var(--land)" stroke="var(--land-line)" stroke-width="2"/>
+          <!-- 豊洲・有明ととのう半島の切れ込み(入り江) -->
+          <path d="M60,430 C80,392 110,378 138,384 C126,412 100,430 60,430 Z" fill="var(--water)" opacity=".9"/>
+          <!-- お台場 -->
+          <path d="M0,452 C40,458 78,466 96,486 C104,514 96,548 62,566 C36,576 10,570 0,562 Z"
+                fill="var(--land)" stroke="var(--land-line)" stroke-width="2"/>
+          <!-- 江戸川区・浦安の陸地 -->
+          <path d="M378,0 H600 V414 C566,428 540,452 508,478 C486,494 460,492 438,470
+                   C420,452 400,440 378,432 C372,340 372,240 374,150 C375,90 376,40 378,0 Z"
+                fill="var(--land)" stroke="var(--land-line)" stroke-width="2"/>
+          <!-- 荒川 -->
+          <path d="M352,0 C358,120 362,260 362,430" fill="none" stroke="var(--water-deep)" stroke-width="22" stroke-linecap="round" opacity=".85"/>
+          <!-- 旧江戸川 -->
+          <path d="M505,0 C492,140 462,290 436,462" fill="none" stroke="var(--water-deep)" stroke-width="12" stroke-linecap="round" opacity=".8"/>
+          <!-- 隅田川 -->
+          <path d="M118,0 C96,120 62,260 24,420" fill="none" stroke="var(--water-deep)" stroke-width="13" stroke-linecap="round" opacity=".8"/>
+          <!-- 東京ゲートブリッジ風 -->
+          <path d="M110,548 L254,548" stroke="#9FB6C4" stroke-width="4" stroke-dasharray="10 6"/>
+          <text x="40" y="596" font-size="13" font-weight="700" fill="#5E93A8">東京湾</text>
+          <text x="330" y="215" font-size="11" font-weight="700" fill="#5E93A8" transform="rotate(84 336 210)">荒川</text>
+          <text x="70" y="150" font-size="11" font-weight="700" fill="#5E93A8" transform="rotate(75 76 145)">隅田川</text>
+          <g id="pinLayer"></g>
+        </svg>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--leaf)"></i>公園・屋外</span>
+        <span><i style="background:var(--indigo)"></i>ミュージアム・屋内</span>
+        <span><i style="background:#3D9BC4"></i>水族館・水あそび</span>
+        <span><i style="background:var(--coral)"></i>テーマ・あそび場</span>
+        <span><i style="background:var(--orange)"></i>おかいもの・その他</span>
+        <span>⭐ = 行ったことある</span>
+      </div>
+      <p class="wheel-note" style="text-align:left;margin-top:6px">うすいピンは、いまの条件から外れているスポットです。ピンをタップすると詳細が見られます。</p>
+      <div class="map-info" id="mapInfo"></div>
+    </div>
+  </section>
+
+  <!-- ============ きろく ============ -->
+  <section id="panel-log" class="panel">
+    <div class="card">
+      <h2>おでかけのきろく</h2>
+      <div class="stats-row">
+        <div class="stat"><div class="num" id="statTotal">0</div><div class="lab">おでかけ回数</div></div>
+        <div class="stat"><div class="num" id="statUnique">0/0</div><div class="lab">スポット制覇</div></div>
+      </div>
+      <div id="visitList"></div>
+    </div>
+  </section>
+
+  <footer>入園料・営業情報は変わることがあります。おでかけ前に公式サイトでご確認ください。</footer>
+</div>
+
+<script>
+/* ================= スポットデータ =================
+   budget: 家族での目安 0=無料 1=〜1,000円 2=〜3,000円 3=3,000円〜
+   ages: [0-2歳, 3-5歳, 6歳以上] / indoor: 雨でも安心か
+   cat: park / museum / water / play / shop                    */
+const SPOTS = [
+ {id:"kiba",      name:"木場公園",                    short:"木場公園",   emoji:"🌳", cat:"park",   indoor:false, budget:0, ages:[1,1,1], lat:35.678, lng:139.808, station:"木場駅 徒歩5分",      desc:"広い芝生と冒険広場の大型遊具。夏はじゃぶじゃぶ池も大人気。"},
+ {id:"mot",       name:"東京都現代美術館",             short:"現代美術館", emoji:"🎨", cat:"museum", indoor:true,  budget:1, ages:[0,1,1], lat:35.681, lng:139.809, station:"清澄白河駅 徒歩9分",   desc:"木場公園のとなり。絵本がそろう美術図書室や子ども向けプログラムも。"},
+ {id:"sarue",     name:"猿江恩賜公園",                 short:"猿江公園",   emoji:"🛝", cat:"park",   indoor:false, budget:0, ages:[1,1,1], lat:35.687, lng:139.815, station:"住吉駅 徒歩2分",      desc:"駅チカで気軽に行ける公園。カラフルな遊具広場とミニ木製アスレチック。"},
+ {id:"kiyosumi",  name:"清澄庭園",                    short:"清澄庭園",   emoji:"🐢", cat:"park",   indoor:false, budget:1, ages:[1,1,1], lat:35.680, lng:139.799, station:"清澄白河駅 徒歩3分",   desc:"池のカメやコイにあいさつできる回遊式庭園。石をつたう磯渡りが冒険気分。"},
+ {id:"fukagawa",  name:"深川江戸資料館",               short:"江戸資料館", emoji:"🏮", cat:"museum", indoor:true,  budget:1, ages:[0,1,1], lat:35.683, lng:139.800, station:"清澄白河駅 徒歩3分",   desc:"実物大の江戸の町にあがって遊べる。長屋や船宿の中に入れて探検みたい。"},
+ {id:"kidzania",  name:"キッザニア東京",               short:"キッザニア", emoji:"👩‍🍳", cat:"play",  indoor:true,  budget:3, ages:[0,1,1], lat:35.6545,lng:139.7915,station:"豊洲駅 徒歩8分",      desc:"約100種のお仕事体験。3歳から参加できるパビリオンも多数。予約がおすすめ。"},
+ {id:"teamlab",   name:"チームラボプラネッツ",          short:"チームラボ", emoji:"💠", cat:"play",   indoor:true,  budget:3, ages:[1,1,1], lat:35.649, lng:139.789, station:"新豊洲駅 徒歩1分",    desc:"水の中を歩く没入型ミュージアム。ひざ下まで水に入るエリアは着替え持参で。"},
+ {id:"lalaport",  name:"ららぽーと豊洲",               short:"ららぽーと", emoji:"🛍️", cat:"shop",   indoor:true,  budget:0, ages:[1,1,1], lat:35.6565,lng:139.793, station:"豊洲駅 直結",        desc:"海ぞいのデッキと船着き場が気持ちいいモール。キッズスペースや飲食も充実。"},
+ {id:"gas",       name:"がすてなーに ガスの科学館",     short:"がすてなーに",emoji:"🔥", cat:"museum", indoor:true,  budget:0, ages:[1,1,1], lat:35.652, lng:139.796, station:"豊洲駅 徒歩6分",      desc:"入館無料の体験型科学館。屋上の芝生広場もあり、雨の日の定番スポット。"},
+ {id:"gururi",    name:"豊洲ぐるり公園",               short:"ぐるり公園", emoji:"⛵", cat:"park",   indoor:false, budget:0, ages:[1,1,1], lat:35.648, lng:139.786, station:"市場前駅 徒歩8分",    desc:"レインボーブリッジをながめる海ぞいの遊歩道。ボール遊びやピクニックに。"},
+ {id:"miraikan",  name:"日本科学未来館",               short:"未来館",     emoji:"🤖", cat:"museum", indoor:true,  budget:2, ages:[1,1,1], lat:35.619, lng:139.776, station:"テレコムセンター駅 徒歩4分", desc:"ロボットや宇宙の展示。乳幼児向けの\"おや?っこひろば\"は事前予約制。"},
+ {id:"lego",      name:"レゴランド・ディスカバリー・センター", short:"レゴランド", emoji:"🧱", cat:"play", indoor:true, budget:3, ages:[0,1,1], lat:35.627, lng:139.775, station:"お台場海浜公園駅 徒歩2分", desc:"屋内型レゴのテーマパーク。ライドや巨大プールで雨の日も一日遊べる。"},
+ {id:"odaiba",    name:"お台場海浜公園",               short:"お台場",     emoji:"🏖️", cat:"park",   indoor:false, budget:0, ages:[1,1,1], lat:35.630, lng:139.774, station:"お台場海浜公園駅 徒歩3分", desc:"砂浜で砂遊びができる都心のビーチ。自由の女神と船をながめてのんびり。"},
+ {id:"aquatics",  name:"東京アクアティクスセンター",    short:"辰巳プール", emoji:"🏊", cat:"water",  indoor:true,  budget:1, ages:[1,1,1], lat:35.6485,lng:139.8175,station:"辰巳駅 徒歩7分",     desc:"オリンピック会場だった屋内プール。水深の浅い幼児向けエリアもあり。"},
+ {id:"yumenoshima",name:"夢の島熱帯植物館",            short:"熱帯植物館", emoji:"🌴", cat:"museum", indoor:true,  budget:1, ages:[1,1,1], lat:35.649, lng:139.828, station:"新木場駅 徒歩13分",   desc:"大きなガラスドームの温室でジャングル探検。雨の日でも南国気分。"},
+ {id:"wakasu",    name:"若洲海浜公園",                 short:"若洲公園",   emoji:"🚴", cat:"park",   indoor:false, budget:0, ages:[1,1,1], lat:35.618, lng:139.833, station:"新木場駅からバス",    desc:"ゲートブリッジのたもと。サイクリングや釣り、大型遊具でのびのび。"},
+ {id:"kasairinkai",name:"葛西臨海水族園",              short:"葛西水族園", emoji:"🐧", cat:"water",  indoor:true,  budget:1, ages:[1,1,1], lat:35.640, lng:139.867, station:"葛西臨海公園駅 徒歩5分", desc:"ドーナツ型の大水槽をマグロがぐるぐる。ペンギンの群れは子どもに鉄板。"},
+ {id:"ferris",    name:"葛西臨海公園・大観覧車",        short:"大観覧車",   emoji:"🎡", cat:"play",   indoor:false, budget:1, ages:[1,1,1], lat:35.644, lng:139.862, station:"葛西臨海公園駅 徒歩7分", desc:"日本最大級の観覧車から東京湾を一望。広い芝生と海べの散歩もセットで。"},
+ {id:"chikahaku", name:"地下鉄博物館",                 short:"地下鉄博物館",emoji:"🚇", cat:"museum", indoor:true,  budget:1, ages:[1,1,1], lat:35.664, lng:139.873, station:"葛西駅 高架下すぐ",   desc:"本物の車両と運転シミュレーター。大人220円・子ども100円のコスパ最強館。"},
+ {id:"kameido",   name:"亀戸天神社",                  short:"亀戸天神",   emoji:"⛩️", cat:"park",   indoor:false, budget:0, ages:[1,1,1], lat:35.703, lng:139.827, station:"亀戸駅 徒歩13分",    desc:"太鼓橋とスカイツリーの共演。藤の季節はとくにきれい。参道でくず餅も。"},
+ {id:"kinshi",    name:"錦糸公園",                    short:"錦糸公園",   emoji:"🌸", cat:"park",   indoor:false, budget:0, ages:[1,1,1], lat:35.697, lng:139.815, station:"錦糸町駅 徒歩5分",   desc:"タコの遊具と噴水広場。となりのオリナスで食事や雨宿りもできて安心。"},
+ {id:"sumida",    name:"すみだ水族館",                 short:"すみだ水族", emoji:"🐠", cat:"water",  indoor:true,  budget:3, ages:[1,1,1], lat:35.710, lng:139.8105,station:"とうきょうスカイツリー駅すぐ", desc:"ソラマチの中の水族館。屋内開放型のペンギンプールを間近でながめられる。"},
+ {id:"skytree",   name:"東京スカイツリー展望台",        short:"スカイツリー",emoji:"🗼", cat:"play",   indoor:true,  budget:3, ages:[1,1,1], lat:35.7135,lng:139.807, station:"押上駅 直結",        desc:"高さ350mからの大パノラマ。ソラマチのおもちゃ売り場とセットで一日コース。"},
+ {id:"komatsugawa",name:"大島小松川公園",              short:"小松川公園", emoji:"🎢", cat:"park",   indoor:false, budget:0, ages:[1,1,1], lat:35.687, lng:139.848, station:"東大島駅 徒歩3分",   desc:"荒川ぞいの大型公園。ロング滑り台のある遊具広場とバーベキュー場が名物。"},
+ {id:"ikspiari",  name:"イクスピアリ",                 short:"イクスピアリ",emoji:"🎬", cat:"shop",   indoor:true,  budget:0, ages:[1,1,1], lat:35.6325,lng:139.884, station:"舞浜駅 徒歩1分",     desc:"舞浜駅前のモール。映画館・キッズショップ・レストランで雨の日も安心。"},
+ {id:"kotsukoen", name:"浦安市交通公園",               short:"交通公園",   emoji:"🚲", cat:"play",   indoor:false, budget:0, ages:[1,1,1], lat:35.6495,lng:139.9035,station:"浦安駅からバス",     desc:"ゴーカートや変わり種自転車、ポニーとのふれあいまで無料で楽しめる穴場。"}
+];
+
+const CAT_COLOR = {park:"#3E9B63", museum:"#5B6ABF", water:"#3D9BC4", play:"#EF6461", shop:"#F49D37"};
+const BUDGET_LABEL = ["無料","〜1,000円","〜3,000円","3,000円〜"];
+const AGE_LABEL = ["0〜2歳","3〜5歳","6歳以上"];
+const WHEEL_COLORS = ["#FFE3A1","#CBE8D4","#F9D2E0","#C9E6F2","#FFF0C9","#DEDAF4"];
+const STORAGE_KEY = "odekake:visits";
+
+/* ================= 状態 ================= */
+let state = {
+  weather:"any",
+  ages:[true,true,false],
+  budget:3,
+  visits:[],
+  currentSpot:null,     // 結果のスポット
+  wheelSpots:[],        // 現在ホイールに載っている候補
+  rotation:0,
+  spinning:false,
+  rating:"😆",
+  storageOK:true
+};
+
+/* ================= ストレージ(localStorage) ================= */
+async function loadVisits(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) state.visits = JSON.parse(raw) || [];
+  }catch(e){ state.visits = []; }
+}
+async function saveVisits(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.visits));
+  }catch(e){
+    state.storageOK = false;
+    console.error("storage error", e);
+  }
+}
+
+/* ================= ユーティリティ ================= */
+const $ = s => document.querySelector(s);
+function geoToXY(lat,lng){
+  // lng 139.765〜139.915 → x 0〜600 / lat 35.72〜35.60 → y 0〜600
+  const x = (lng-139.765)/0.15*600;
+  const y = (35.72-lat)/0.12*600;
+  return {x,y};
+}
+function filteredSpots(){
+  return SPOTS.filter(s=>{
+    if(state.weather==="indoor" && !s.indoor) return false;
+    if(s.budget > state.budget) return false;
+    const anyAge = state.ages.some(Boolean);
+    if(anyAge){
+      for(let i=0;i<3;i++){ if(state.ages[i] && !s.ages[i]) return false; }
+    }
+    return true;
+  });
+}
+function visitedIds(){ return new Set(state.visits.map(v=>v.spotId)); }
+function esc(t){ return String(t).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ================= タブ ================= */
+document.querySelectorAll(".tab").forEach(tab=>{
+  tab.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected","false"));
+    tab.setAttribute("aria-selected","true");
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+    document.getElementById(tab.dataset.panel).classList.add("active");
+    if(tab.dataset.panel==="panel-map") renderMap();
+    if(tab.dataset.panel==="panel-log") renderVisits();
+  });
+});
+
+/* ================= フィルタ ================= */
+$("#weatherChips").addEventListener("click", e=>{
+  const b = e.target.closest(".chip"); if(!b) return;
+  document.querySelectorAll("#weatherChips .chip").forEach(c=>c.setAttribute("aria-pressed","false"));
+  b.setAttribute("aria-pressed","true");
+  state.weather = b.dataset.weather;
+  onFilterChange();
+});
+$("#ageChips").addEventListener("click", e=>{
+  const b = e.target.closest(".chip"); if(!b) return;
+  const i = +b.dataset.age;
+  state.ages[i] = !state.ages[i];
+  b.setAttribute("aria-pressed", String(state.ages[i]));
+  onFilterChange();
+});
+$("#budgetChips").addEventListener("click", e=>{
+  const b = e.target.closest(".chip"); if(!b) return;
+  document.querySelectorAll("#budgetChips .chip").forEach(c=>c.setAttribute("aria-pressed","false"));
+  b.setAttribute("aria-pressed","true");
+  state.budget = +b.dataset.budget;
+  onFilterChange();
+});
+function onFilterChange(){
+  const list = filteredSpots();
+  const note = $("#countNote");
+  if(list.length===0){
+    note.textContent = "条件にあうスポットがありません。すこしゆるめてみてください";
+    note.classList.add("zero");
+  }else{
+    note.textContent = `いまの条件にあうのは ${list.length} スポット！`;
+    note.classList.remove("zero");
+  }
+  buildWheel();
+  renderMap();
+}
+
+/* ================= ホイール描画 ================= */
+function polar(cx,cy,r,aDeg){
+  const a = aDeg*Math.PI/180;
+  return [cx + r*Math.sin(a), cy - r*Math.cos(a)];
+}
+function segPath(cx,cy,r,a0,a1){
+  const [x0,y0]=polar(cx,cy,r,a0), [x1,y1]=polar(cx,cy,r,a1);
+  const large = (a1-a0)>180 ? 1 : 0;
+  return `M${cx},${cy} L${x0.toFixed(2)},${y0.toFixed(2)} A${r},${r} 0 ${large} 1 ${x1.toFixed(2)},${y1.toFixed(2)} Z`;
+}
+function buildWheel(){
+  const g = $("#wheelGroup");
+  const note = $("#wheelNote");
+  let list = filteredSpots();
+  let sampled = false;
+  if(list.length>12){
+    list = [...list].sort(()=>Math.random()-.5).slice(0,12);
+    sampled = true;
+  }
+  state.wheelSpots = list;
+  g.innerHTML = "";
+  if(list.length===0){
+    note.textContent = "";
+    $("#spinBtn").disabled = true;
+    return;
+  }
+  $("#spinBtn").disabled = state.spinning;
+  const n = list.length, seg = 360/n;
+  let html = "";
+  list.forEach((s,i)=>{
+    const a0=i*seg, a1=(i+1)*seg, am=a0+seg/2;
+    html += `<path d="${segPath(150,150,140,a0,a1)}" fill="${WHEEL_COLORS[i%WHEEL_COLORS.length]}" stroke="#fff" stroke-width="2"/>`;
+    if(n===1){
+      html += `<text x="150" y="80" text-anchor="middle" font-size="22">${s.emoji}</text>`;
+      html += `<text x="150" y="106" text-anchor="middle" font-size="13" font-weight="700" fill="#1E3A50">${esc(s.short)}</text>`;
+    }else{
+      html += `<g transform="rotate(${am} 150 150)">
+        <text x="150" y="46" text-anchor="middle" font-size="17">${s.emoji}</text>
+        <text x="150" y="62" font-size="10.5" font-weight="700" fill="#1E3A50" style="writing-mode:vertical-rl;text-anchor:start" text-anchor="start">${esc(s.short)}</text>
+      </g>`;
+    }
+  });
+  g.innerHTML = html;
+  // 電飾ドット
+  const dots = $("#rimDots");
+  let d = "";
+  for(let i=0;i<24;i++){
+    const [x,y]=polar(150,150,146,i*15);
+    d += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.4" fill="${i%2? "var(--sun)":"#fff"}" stroke="var(--line)" stroke-width="1"/>`;
+  }
+  dots.innerHTML = d;
+  note.textContent = sampled
+    ? `候補が多いので、そのうち12スポットをホイールにのせています（まわすたびに入れかわります）`
+    : `${n}スポットの中から運命の1か所を…`;
+}
+
+/* ================= スピン ================= */
+$("#spinBtn").addEventListener("click", ()=>{
+  if(state.spinning) return;
+  const list = state.wheelSpots;
+  if(!list.length) return;
+  state.spinning = true;
+  $("#spinBtn").disabled = true;
+  $("#resultCard").classList.remove("show");
+  $("#recordForm").classList.remove("show");
+
+  const n = list.length, seg = 360/n;
+  const winIdx = Math.floor(Math.random()*n);
+  const jitter = (Math.random()-.5)*seg*0.6;
+  const targetWithin = 360 - (winIdx*seg + seg/2) + jitter; // ポインター(上)に来る角度
+  const current = state.rotation % 360;
+  let delta = (5*360) + ((targetWithin - current + 360*10) % 360);
+  state.rotation += delta;
+
+  const g = $("#wheelGroup");
+  g.style.transform = `rotate(${state.rotation}deg)`;
+
+  let done = false;
+  const finish = ()=>{
+    if(done) return; done = true;
+    state.spinning = false;
+    showResult(list[winIdx]);
+    buildWheelAfterSpin();
+  };
+  g.addEventListener("transitionend", finish, {once:true});
+  setTimeout(finish, 4800); // フォールバック
+});
+function buildWheelAfterSpin(){
+  $("#spinBtn").disabled = false;
+  $("#spinBtn").textContent = "もう一回";
+}
+
+/* ================= 結果表示 ================= */
+function showResult(spot){
+  state.currentSpot = spot;
+  $("#resName").innerHTML = `<span class="emoji">${spot.emoji}</span>${esc(spot.name)}`;
+  const v = visitedIds().has(spot.id);
+  $("#resBadges").innerHTML = `
+    <span class="badge ${spot.indoor?'b-in':'b-out'}">${spot.indoor?'☔ 雨でも安心':'☀️ 屋外メイン'}</span>
+    <span class="badge b-budget">💰 ${BUDGET_LABEL[spot.budget]}</span>
+    <span class="badge">🎈 ${spot.ages.map((ok,i)=>ok?AGE_LABEL[i]:null).filter(Boolean).join("・")}</span>
+    <span class="badge">🚉 ${esc(spot.station)}</span>
+    ${v?'<span class="badge" style="background:#FFF0D2;color:#8A5B00">⭐ 行ったことある</span>':''}
+  `;
+  $("#resDesc").textContent = spot.desc;
+  $("#gmapLink").href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(spot.name);
+  $("#resultCard").classList.add("show");
+  $("#resultCard").scrollIntoView({behavior:"smooth", block:"nearest"});
+  confetti();
+}
+function confetti(){
+  if(matchMedia("(prefers-reduced-motion:reduce)").matches) return;
+  const colors=["#FFB531","#EF6461","#3E9B63","#5B6ABF","#F5A3C0","#3D9BC4"];
+  for(let i=0;i<26;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left = Math.random()*100+"vw";
+    c.style.background = colors[i%colors.length];
+    c.style.animationDuration = (1.6+Math.random()*1.4)+"s";
+    c.style.animationDelay = (Math.random()*0.3)+"s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 3400);
+  }
+}
+
+/* ================= 記録フォーム ================= */
+$("#openRecordBtn").addEventListener("click", ()=>{
+  $("#recDate").value = new Date().toISOString().slice(0,10);
+  $("#recMemo").value = "";
+  $("#recordForm").classList.add("show");
+});
+$("#cancelRecordBtn").addEventListener("click", ()=> $("#recordForm").classList.remove("show"));
+$("#ratingRow").addEventListener("click", e=>{
+  const b = e.target.closest(".chip"); if(!b) return;
+  document.querySelectorAll("#ratingRow .chip").forEach(c=>c.setAttribute("aria-pressed","false"));
+  b.setAttribute("aria-pressed","true");
+  state.rating = b.dataset.rate;
+});
+$("#saveRecordBtn").addEventListener("click", async ()=>{
+  if(!state.currentSpot) return;
+  const rec = {
+    id: "v"+Date.now(),
+    spotId: state.currentSpot.id,
+    date: $("#recDate").value || new Date().toISOString().slice(0,10),
+    rating: state.rating,
+    memo: $("#recMemo").value.trim(),
+    ts: Date.now()
+  };
+  state.visits.unshift(rec);
+  await saveVisits();
+  $("#recordForm").classList.remove("show");
+  $("#saveRecordBtn").textContent = "保存する";
+  showResult(state.currentSpot); // ⭐バッジ更新
+  renderVisits();
+  renderMap();
+});
+
+/* ================= マップ ================= */
+function renderMap(){
+  const layer = $("#pinLayer");
+  const okIds = new Set(filteredSpots().map(s=>s.id));
+  const vIds = visitedIds();
+  let html = "";
+  SPOTS.forEach(s=>{
+    const {x,y} = geoToXY(s.lat,s.lng);
+    const dim = okIds.has(s.id) ? "" : "dim";
+    const sel = (state.currentSpot && state.currentSpot.id===s.id) ? "selected" : "";
+    html += `<g class="pin ${dim} ${sel}" data-id="${s.id}" tabindex="0" role="button" aria-label="${esc(s.name)}">
+      <circle class="halo" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="10" fill="${CAT_COLOR[s.cat]}" opacity="0"/>
+      <circle class="dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="${CAT_COLOR[s.cat]}"/>
+      <text x="${x.toFixed(1)}" y="${(y+4).toFixed(1)}" text-anchor="middle" font-size="10" pointer-events="none">${s.emoji}</text>
+      ${vIds.has(s.id)? `<text x="${(x+8).toFixed(1)}" y="${(y-7).toFixed(1)}" font-size="10" pointer-events="none">⭐</text>`:""}
+    </g>`;
+  });
+  layer.innerHTML = html;
+}
+$("#mapSvg").addEventListener("click", e=>{
+  const pin = e.target.closest(".pin"); if(!pin) return;
+  showMapInfo(pin.dataset.id);
+});
+$("#mapSvg").addEventListener("keydown", e=>{
+  if(e.key!=="Enter" && e.key!==" ") return;
+  const pin = e.target.closest(".pin"); if(!pin) return;
+  e.preventDefault();
+  showMapInfo(pin.dataset.id);
+});
+function showMapInfo(id){
+  const s = SPOTS.find(x=>x.id===id); if(!s) return;
+  const v = visitedIds().has(s.id);
+  const box = $("#mapInfo");
+  box.innerHTML = `
+    <div class="result-name"><span class="emoji">${s.emoji}</span>${esc(s.name)} ${v?"⭐":""}</div>
+    <div class="badges">
+      <span class="badge ${s.indoor?'b-in':'b-out'}">${s.indoor?'☔ 雨でも安心':'☀️ 屋外メイン'}</span>
+      <span class="badge b-budget">💰 ${BUDGET_LABEL[s.budget]}</span>
+      <span class="badge">🚉 ${esc(s.station)}</span>
+    </div>
+    <p class="result-desc">${esc(s.desc)}</p>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="mapRecordBtn">📖 ここに行った記録</button>
+      <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.name)}" target="_blank" rel="noopener">Googleマップで開く</a>
+    </div>`;
+  box.classList.add("show");
+  $("#mapRecordBtn").addEventListener("click", async ()=>{
+    const rec = {id:"v"+Date.now(), spotId:s.id, date:new Date().toISOString().slice(0,10), rating:"😊", memo:"", ts:Date.now()};
+    state.visits.unshift(rec);
+    await saveVisits();
+    renderMap(); renderVisits(); showMapInfo(s.id);
+  });
+}
+$("#showOnMapBtn").addEventListener("click", ()=>{
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected", t.dataset.panel==="panel-map" ? "true":"false"));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  $("#panel-map").classList.add("active");
+  renderMap();
+  if(state.currentSpot) showMapInfo(state.currentSpot.id);
+});
+
+/* ================= 記録一覧 ================= */
+function renderVisits(){
+  $("#statTotal").textContent = state.visits.length;
+  $("#statUnique").textContent = `${visitedIds().size}/${SPOTS.length}`;
+  const list = $("#visitList");
+  if(!state.visits.length){
+    list.innerHTML = `<p class="empty-note">まだ記録がありません。<br>ルーレットをまわして、はじめてのおでかけを記録しよう 🎡</p>`;
+    return;
+  }
+  list.innerHTML = state.visits.map(v=>{
+    const s = SPOTS.find(x=>x.id===v.spotId) || {emoji:"📍", name:"（不明なスポット）"};
+    return `<div class="visit-item">
+      <div class="visit-emoji">${s.emoji}</div>
+      <div class="visit-body">
+        <div class="visit-name">${esc(s.name)} <span style="font-weight:400">${v.rating||""}</span></div>
+        <div class="visit-meta">${esc(v.date||"")}</div>
+        ${v.memo? `<div class="visit-memo">${esc(v.memo)}</div>`:""}
+      </div>
+      <button class="btn-danger" data-del="${v.id}">けす</button>
+    </div>`;
+  }).join("");
+}
+$("#visitList").addEventListener("click", async e=>{
+  const btn = e.target.closest("[data-del]"); if(!btn) return;
+  state.visits = state.visits.filter(v=>v.id!==btn.dataset.del);
+  await saveVisits();
+  renderVisits(); renderMap();
+});
+
+/* ================= 初期化 ================= */
+(async function init(){
+  await loadVisits();
+  onFilterChange();
+  renderVisits();
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("sw.js").catch(()=>{});
+  }
+})();
+</script>
+</body>
+</html>
