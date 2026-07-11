@@ -119,10 +119,11 @@
     font-family:inherit;font-size:17px;font-weight:900;color:var(--ink);cursor:pointer;box-shadow:var(--shadow);touch-action:manipulation}
   .map-zoom button:active{transform:scale(.94)}
   .pin{cursor:pointer}
-  .pin circle.dot{stroke:#fff;stroke-width:1.6}
+  .pin circle.dot{stroke:#fff;stroke-width:1.8}
   .pin.dim{opacity:.22}
+  .pin-label{fill:var(--ink);paint-order:stroke;stroke:#fff;stroke-width:2.6px;stroke-linejoin:round}
   .pin.selected circle.halo{animation:pulse 1.4s ease-out infinite}
-  @keyframes pulse{0%{r:8;opacity:.7}100%{r:22;opacity:0}}
+  @keyframes pulse{0%{r:12;opacity:.7}100%{r:32;opacity:0}}
   .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:11.5px;font-weight:700;color:var(--ink-soft)}
   .legend span{display:flex;align-items:center;gap:5px}
   .legend i{width:11px;height:11px;border-radius:50%;display:inline-block}
@@ -723,14 +724,26 @@ function renderMap(){
     const {x,y} = geoToXY(s.lat,s.lng);
     const dim = okIds.has(s.id) ? "" : "dim";
     const sel = (state.currentSpot && state.currentSpot.id===s.id) ? "selected" : "";
-    html += `<g class="pin ${dim} ${sel}" data-id="${s.id}" tabindex="0" role="button" aria-label="${esc(s.name)}">
-      <circle class="halo" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8" fill="${CAT_COLOR[s.cat]}" opacity="0"/>
-      <circle class="dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6.5" fill="${CAT_COLOR[s.cat]}"/>
-      <text x="${x.toFixed(1)}" y="${(y+2.8).toFixed(1)}" text-anchor="middle" font-size="7.5" pointer-events="none">${s.emoji}</text>
-      ${vIds.has(s.id)? `<text x="${(x+5.5).toFixed(1)}" y="${(y-5.5).toFixed(1)}" font-size="8" pointer-events="none">⭐</text>`:""}
+    html += `<g class="pin ${dim} ${sel}" data-id="${s.id}" data-x="${x.toFixed(1)}" data-y="${y.toFixed(1)}" tabindex="0" role="button" aria-label="${esc(s.name)}">
+      <circle class="halo" cx="0" cy="0" r="12" fill="${CAT_COLOR[s.cat]}" opacity="0"/>
+      <circle class="dot" cx="0" cy="0" r="10" fill="${CAT_COLOR[s.cat]}"/>
+      <text x="0" y="4" text-anchor="middle" font-size="11" pointer-events="none">${s.emoji}</text>
+      ${vIds.has(s.id)? `<text x="8" y="-8" font-size="10" pointer-events="none">⭐</text>`:""}
+      <text class="pin-label" x="0" y="22" text-anchor="middle" font-size="8" font-weight="700" pointer-events="none">${esc(s.short)}</text>
     </g>`;
   });
   layer.innerHTML = html;
+  updatePinScale();
+}
+/* ズーム率に関わらずピンの見た目サイズを一定に保つ */
+function updatePinScale(){
+  const k = vb.w / 270;
+  const showLabel = vb.w < 90;
+  document.querySelectorAll("#pinLayer .pin").forEach(p=>{
+    p.setAttribute("transform", `translate(${p.dataset.x} ${p.dataset.y}) scale(${k.toFixed(4)})`);
+    const l = p.querySelector(".pin-label");
+    if(l) l.style.display = showLabel ? "" : "none";
+  });
 }
 function showMapInfo(id){
   const s = SPOTS.find(x=>x.id===id); if(!s) return;
@@ -761,7 +774,7 @@ $("#showOnMapBtn").addEventListener("click", ()=>{
   if(state.currentSpot){
     showMapInfo(state.currentSpot.id);
     const {x,y} = geoToXY(state.currentSpot.lat, state.currentSpot.lng);
-    vb.w = vb.h = 150; vb.x = x - 75; vb.y = y - 75;
+    vb.w = vb.h = 40; vb.x = x - 20; vb.y = y - 20;
     clampVB(); applyVB();
   }
 });
@@ -769,9 +782,12 @@ $("#showOnMapBtn").addEventListener("click", ()=>{
 /* ================= マップのズーム＆パン ================= */
 const mapSvg = $("#mapSvg");
 let vb = {x:0, y:0, w:600, h:600};
-function applyVB(){ mapSvg.setAttribute("viewBox", `${vb.x.toFixed(1)} ${vb.y.toFixed(1)} ${vb.w.toFixed(1)} ${vb.h.toFixed(1)}`); }
+function applyVB(){
+  mapSvg.setAttribute("viewBox", `${vb.x.toFixed(2)} ${vb.y.toFixed(2)} ${vb.w.toFixed(2)} ${vb.h.toFixed(2)}`);
+  updatePinScale();
+}
 function clampVB(){
-  vb.w = Math.min(600, Math.max(70, vb.w)); vb.h = vb.w;
+  vb.w = Math.min(600, Math.max(6, vb.w)); vb.h = vb.w;
   vb.x = Math.min(600-vb.w, Math.max(0, vb.x));
   vb.y = Math.min(600-vb.h, Math.max(0, vb.y));
 }
