@@ -181,6 +181,25 @@
         <div class="chips" id="areaChips"></div>
       </div>
 
+      <div class="filter-group" id="radiusGroup" style="display:none">
+        <div class="filter-label">📏 現在地からの距離</div>
+        <div class="chips" id="radiusChips">
+          <button class="chip" data-radius="3" aria-pressed="false">3km以内</button>
+          <button class="chip" data-radius="5" aria-pressed="true">5km以内</button>
+          <button class="chip" data-radius="10" aria-pressed="false">10km以内</button>
+        </div>
+      </div>
+
+      <div class="filter-group" id="walkGroup" style="display:none">
+        <div class="filter-label">🚶 駅から徒歩（東京23区）</div>
+        <div class="chips" id="walkChips">
+          <button class="chip" data-walk="99" aria-pressed="true">きにしない</button>
+          <button class="chip" data-walk="5" aria-pressed="false">5分以内</button>
+          <button class="chip" data-walk="10" aria-pressed="false">10分以内</button>
+          <button class="chip" data-walk="15" aria-pressed="false">15分以内</button>
+        </div>
+      </div>
+
       <div class="filter-group">
         <div class="filter-label">☁️ お天気</div>
         <div class="chips" id="weatherChips">
@@ -365,98 +384,98 @@
    cat: park / museum / water / play / shop / pref: エリア   */
 const SPOTS = [
  /* ---- 東京23区 ---- */
- {id:"kiba",name:"木場公園",short:"木場公園",emoji:"🌳",cat:"park",indoor:false,budget:0,ages:[1,1,1],lat:35.678,lng:139.808,station:"木場駅 徒歩5分",desc:"広い芝生と冒険広場の大型遊具。夏はじゃぶじゃぶ池も大人気。",pref:"t23"},
- {id:"mot",name:"東京都現代美術館",short:"現代美術館",emoji:"🎨",cat:"museum",indoor:true,budget:1,ages:[0,1,1],lat:35.681,lng:139.809,station:"清澄白河駅 徒歩9分",desc:"木場公園のとなり。絵本のそろう美術図書室や子ども向けプログラムも。",pref:"t23"},
- {id:"sarue",name:"猿江恩賜公園",short:"猿江公園",emoji:"🛝",cat:"park",indoor:false,budget:0,ages:[1,1,1],lat:35.687,lng:139.815,station:"住吉駅 徒歩2分",desc:"駅チカで気軽に行ける公園。カラフルな遊具広場とミニアスレチック。",pref:"t23"},
- {id:"kiyosumi",name:"清澄庭園",short:"清澄庭園",emoji:"🐢",cat:"park",indoor:false,budget:1,ages:[1,1,1],lat:35.680,lng:139.799,station:"清澄白河駅 徒歩3分",desc:"池のカメやコイにあいさつできる庭園。石をつたう磯渡りが冒険気分。",pref:"t23"},
- {id:"fukagawa",name:"深川江戸資料館",short:"江戸資料館",emoji:"🏮",cat:"museum",indoor:true,budget:1,ages:[0,1,1],lat:35.683,lng:139.800,station:"清澄白河駅 徒歩3分",desc:"実物大の江戸の町にあがって遊べる。長屋や船宿の中を探検。",pref:"t23"},
- {id:"kidzania",name:"キッザニア東京",short:"キッザニア",emoji:"👩‍🍳",cat:"play",indoor:true,budget:3,ages:[0,1,1],lat:35.6545,lng:139.7915,station:"豊洲駅 徒歩8分",desc:"約100種のお仕事体験。3歳から参加OK、予約がおすすめ。",pref:"t23"},
- {id:"teamlab",name:"チームラボプラネッツ",short:"チームラボ",emoji:"💠",cat:"play",indoor:true,budget:3,ages:[1,1,1],lat:35.649,lng:139.789,station:"新豊洲駅 徒歩1分",desc:"水の中を歩く没入型ミュージアム。着替え持参で。",pref:"t23"},
- {id:"lalaport",name:"ららぽーと豊洲",short:"ららぽーと",emoji:"🛍️",cat:"shop",indoor:true,budget:0,ages:[1,1,1],lat:35.6565,lng:139.793,station:"豊洲駅 直結",desc:"海ぞいのデッキが気持ちいいモール。キッズスペースも充実。",pref:"t23"},
- {id:"gas",name:"がすてなーに ガスの科学館",short:"がすてなーに",emoji:"🔥",cat:"museum",indoor:true,budget:0,ages:[1,1,1],lat:35.652,lng:139.796,station:"豊洲駅 徒歩6分",desc:"入館無料の体験型科学館。雨の日の定番スポット。",pref:"t23"},
- {id:"gururi",name:"豊洲ぐるり公園",short:"ぐるり公園",emoji:"⛵",cat:"park",indoor:false,budget:0,ages:[1,1,1],lat:35.648,lng:139.786,station:"市場前駅 徒歩8分",desc:"レインボーブリッジをながめる海ぞいの遊歩道。ピクニックに。",pref:"t23"},
- {id:"miraikan",name:"日本科学未来館",short:"未来館",emoji:"🤖",cat:"museum",indoor:true,budget:2,ages:[1,1,1],lat:35.645,lng:139.776,station:"テレコムセンター駅 徒歩4分",desc:"ロボットと宇宙の展示。乳幼児向けひろばは事前予約制。",pref:"t23"},
- {id:"lego",name:"レゴランド・ディスカバリー・センター",short:"レゴランド",emoji:"🧱",cat:"play",indoor:true,budget:3,ages:[0,1,1],lat:35.647,lng:139.774,station:"お台場海浜公園駅 徒歩2分",desc:"屋内型レゴのテーマパーク。雨の日も一日遊べる。",pref:"t23"},
- {id:"odaiba",name:"お台場海浜公園",short:"お台場",emoji:"🏖️",cat:"park",indoor:false,budget:0,ages:[1,1,1],lat:35.649,lng:139.772,station:"お台場海浜公園駅 徒歩3分",desc:"都心のビーチで砂遊び。自由の女神と船をながめてのんびり。",pref:"t23"},
- {id:"aquatics",name:"東京アクアティクスセンター",short:"辰巳プール",emoji:"🏊",cat:"water",indoor:true,budget:1,ages:[1,1,1],lat:35.6485,lng:139.8175,station:"辰巳駅 徒歩7分",desc:"五輪会場だった屋内プール。水深の浅い幼児向けエリアも。",pref:"t23"},
- {id:"yumenoshima",name:"夢の島熱帯植物館",short:"熱帯植物館",emoji:"🌴",cat:"museum",indoor:true,budget:1,ages:[1,1,1],lat:35.652,lng:139.828,station:"新木場駅 徒歩13分",desc:"大きなガラス温室でジャングル探検。雨でも南国気分。",pref:"t23"},
- {id:"wakasu",name:"若洲海浜公園",short:"若洲公園",emoji:"🚴",cat:"park",indoor:false,budget:0,ages:[1,1,1],lat:35.636,lng:139.833,station:"新木場駅からバス",desc:"ゲートブリッジのたもと。サイクリングや釣り、大型遊具も。",pref:"t23"},
- {id:"kasairinkai",name:"葛西臨海水族園",short:"葛西水族園",emoji:"🐧",cat:"water",indoor:true,budget:1,ages:[1,1,1],lat:35.642,lng:139.863,station:"葛西臨海公園駅 徒歩5分",desc:"マグロがぐるぐる回る大水槽とペンギンの群れ。",pref:"t23"},
- {id:"ferris",name:"葛西臨海公園・大観覧車",short:"大観覧車",emoji:"🎡",cat:"play",indoor:false,budget:1,ages:[1,1,1],lat:35.646,lng:139.859,station:"葛西臨海公園駅 徒歩7分",desc:"日本最大級の観覧車から東京湾を一望。芝生と海べの散歩も。",pref:"t23"},
- {id:"chikahaku",name:"地下鉄博物館",short:"地下鉄博物館",emoji:"🚇",cat:"museum",indoor:true,budget:1,ages:[1,1,1],lat:35.664,lng:139.873,station:"葛西駅 高架下すぐ",desc:"本物の車両と運転シミュレーター。コスパ最強の鉄道館。",pref:"t23"},
- {id:"kameido",name:"亀戸天神社",short:"亀戸天神",emoji:"⛩️",cat:"park",indoor:false,budget:0,ages:[1,1,1],lat:35.703,lng:139.827,station:"亀戸駅 徒歩13分",desc:"太鼓橋とスカイツリーの共演。参道でくず餅も。",pref:"t23"},
- {id:"kinshi",name:"錦糸公園",short:"錦糸公園",emoji:"🌸",cat:"park",indoor:false,budget:0,ages:[1,1,1],lat:35.697,lng:139.815,station:"錦糸町駅 徒歩5分",desc:"タコの遊具と噴水広場。となりのモールで雨宿りもできる。",pref:"t23"},
- {id:"sumida",name:"すみだ水族館",short:"すみだ水族",emoji:"🐠",cat:"water",indoor:true,budget:3,ages:[1,1,1],lat:35.710,lng:139.8105,station:"とうきょうスカイツリー駅すぐ",desc:"ソラマチの中。屋内開放型のペンギンプールを間近で。",pref:"t23"},
- {id:"skytree",name:"東京スカイツリー展望台",short:"スカイツリー",emoji:"🗼",cat:"play",indoor:true,budget:3,ages:[1,1,1],lat:35.7135,lng:139.807,station:"押上駅 直結",desc:"高さ350mの大パノラマ。ソラマチとセットで一日コース。",pref:"t23"},
- {id:"komatsugawa",name:"大島小松川公園",short:"小松川公園",emoji:"🎢",cat:"park",indoor:false,budget:0,ages:[1,1,1],lat:35.687,lng:139.848,station:"東大島駅 徒歩3分",desc:"荒川ぞいの大型公園。ロング滑り台とBBQ場が名物。",pref:"t23"},
- {id:"ueno_zoo",name:"上野動物園",short:"上野動物園",emoji:"🐼",cat:"park",indoor:false,budget:1,ages:[1,1,1],lat:35.716,lng:139.771,station:"上野駅 徒歩5分",desc:"パンダでおなじみ日本最古の動物園。中学生以下は無料。",pref:"t23"},
- {id:"kahaku",name:"国立科学博物館",short:"科博",emoji:"🦖",cat:"museum",indoor:true,budget:1,ages:[1,1,1],lat:35.719,lng:139.7765,station:"上野駅 徒歩5分",desc:"恐竜の全身骨格に大興奮。「親と子のたんけんひろば」も。",pref:"t23"},
- {id:"shinagawa_aq",name:"しながわ水族館",short:"しながわ水",emoji:"🐬",cat:"water",indoor:true,budget:2,ages:[1,1,1],lat:35.588,lng:139.737,station:"大森海岸駅 徒歩8分",desc:"イルカショーが間近で見られる。公園併設でお弁当も。",pref:"t23"},
- {id:"yoyogi",name:"代々木公園",short:"代々木公園",emoji:"🌳",cat:"park",indoor:false,budget:0,ages:[1,1,1],lat:35.671,lng:139.696,station:"原宿駅 徒歩3分",desc:"広大な芝生とサイクリングコース。ピクニックの聖地。",pref:"t23"},
- {id:"asukayama",name:"飛鳥山公園",short:"飛鳥山公園",emoji:"🚂",cat:"park",indoor:false,budget:0,ages:[1,1,1],lat:35.750,lng:139.738,station:"王子駅 徒歩1分",desc:"SLと都電の展示車両に乗れる。ミニモノレールも無料。",pref:"t23"},
- {id:"sunshine_aq",name:"サンシャイン水族館",short:"サンシャイン",emoji:"🐡",cat:"water",indoor:true,budget:3,ages:[1,1,1],lat:35.729,lng:139.719,station:"池袋駅 徒歩10分",desc:"頭上をペンギンが飛ぶ「天空のペンギン」が名物。",pref:"t23"},
- {id:"toy_museum",name:"東京おもちゃ美術館",short:"おもちゃ美",emoji:"🧸",cat:"museum",indoor:true,budget:2,ages:[1,1,1],lat:35.689,lng:139.722,station:"四谷三丁目駅 徒歩7分",desc:"木のおもちゃで一日遊べる。0〜2歳専用の赤ちゃん木育ひろばも。",pref:"t23"},
+ {id:"kiba",name:"木場公園",short:"木場公園",emoji:"🌳",cat:"park",indoor:false,budget:0,ages:[1,1,1],walk:5,lat:35.678,lng:139.808,station:"木場駅 徒歩5分",desc:"広い芝生と冒険広場の大型遊具。夏はじゃぶじゃぶ池も大人気。",pref:"t23"},
+ {id:"mot",name:"東京都現代美術館",short:"現代美術館",emoji:"🎨",cat:"museum",indoor:true,budget:1,ages:[0,1,1],walk:9,lat:35.681,lng:139.809,station:"清澄白河駅 徒歩9分",desc:"木場公園のとなり。絵本のそろう美術図書室や子ども向けプログラムも。",pref:"t23"},
+ {id:"sarue",name:"猿江恩賜公園",short:"猿江公園",emoji:"🛝",cat:"park",indoor:false,budget:0,ages:[1,1,1],walk:2,lat:35.687,lng:139.815,station:"住吉駅 徒歩2分",desc:"駅チカで気軽に行ける公園。カラフルな遊具広場とミニアスレチック。",pref:"t23"},
+ {id:"kiyosumi",name:"清澄庭園",short:"清澄庭園",emoji:"🐢",cat:"park",indoor:false,budget:1,ages:[1,1,1],walk:3,lat:35.680,lng:139.799,station:"清澄白河駅 徒歩3分",desc:"池のカメやコイにあいさつできる庭園。石をつたう磯渡りが冒険気分。",pref:"t23"},
+ {id:"fukagawa",name:"深川江戸資料館",short:"江戸資料館",emoji:"🏮",cat:"museum",indoor:true,budget:1,ages:[0,1,1],walk:3,lat:35.683,lng:139.800,station:"清澄白河駅 徒歩3分",desc:"実物大の江戸の町にあがって遊べる。長屋や船宿の中を探検。",pref:"t23"},
+ {id:"kidzania",name:"キッザニア東京",short:"キッザニア",emoji:"👩‍🍳",cat:"play",indoor:true,budget:3,ages:[0,1,1],walk:8,lat:35.6545,lng:139.7915,station:"豊洲駅 徒歩8分",desc:"約100種のお仕事体験。3歳から参加OK、予約がおすすめ。",pref:"t23"},
+ {id:"teamlab",name:"チームラボプラネッツ",short:"チームラボ",emoji:"💠",cat:"play",indoor:true,budget:3,ages:[1,1,1],walk:1,lat:35.649,lng:139.789,station:"新豊洲駅 徒歩1分",desc:"水の中を歩く没入型ミュージアム。着替え持参で。",pref:"t23"},
+ {id:"lalaport",name:"ららぽーと豊洲",short:"ららぽーと",emoji:"🛍️",cat:"shop",indoor:true,budget:0,ages:[1,1,1],walk:1,lat:35.6565,lng:139.793,station:"豊洲駅 直結",desc:"海ぞいのデッキが気持ちいいモール。キッズスペースも充実。",pref:"t23"},
+ {id:"gas",name:"がすてなーに ガスの科学館",short:"がすてなーに",emoji:"🔥",cat:"museum",indoor:true,budget:0,ages:[1,1,1],walk:6,lat:35.652,lng:139.796,station:"豊洲駅 徒歩6分",desc:"入館無料の体験型科学館。雨の日の定番スポット。",pref:"t23"},
+ {id:"gururi",name:"豊洲ぐるり公園",short:"ぐるり公園",emoji:"⛵",cat:"park",indoor:false,budget:0,ages:[1,1,1],walk:8,lat:35.648,lng:139.786,station:"市場前駅 徒歩8分",desc:"レインボーブリッジをながめる海ぞいの遊歩道。ピクニックに。",pref:"t23"},
+ {id:"miraikan",name:"日本科学未来館",short:"未来館",emoji:"🤖",cat:"museum",indoor:true,budget:2,ages:[1,1,1],walk:4,lat:35.645,lng:139.776,station:"テレコムセンター駅 徒歩4分",desc:"ロボットと宇宙の展示。乳幼児向けひろばは事前予約制。",pref:"t23"},
+ {id:"lego",name:"レゴランド・ディスカバリー・センター",short:"レゴランド",emoji:"🧱",cat:"play",indoor:true,budget:3,ages:[0,1,1],walk:2,lat:35.647,lng:139.774,station:"お台場海浜公園駅 徒歩2分",desc:"屋内型レゴのテーマパーク。雨の日も一日遊べる。",pref:"t23"},
+ {id:"odaiba",name:"お台場海浜公園",short:"お台場",emoji:"🏖️",cat:"park",indoor:false,budget:0,ages:[1,1,1],walk:3,lat:35.649,lng:139.772,station:"お台場海浜公園駅 徒歩3分",desc:"都心のビーチで砂遊び。自由の女神と船をながめてのんびり。",pref:"t23"},
+ {id:"aquatics",name:"東京アクアティクスセンター",short:"辰巳プール",emoji:"🏊",cat:"water",indoor:true,budget:1,ages:[1,1,1],walk:7,lat:35.6485,lng:139.8175,station:"辰巳駅 徒歩7分",desc:"五輪会場だった屋内プール。水深の浅い幼児向けエリアも。",pref:"t23"},
+ {id:"yumenoshima",name:"夢の島熱帯植物館",short:"熱帯植物館",emoji:"🌴",cat:"museum",indoor:true,budget:1,ages:[1,1,1],walk:13,lat:35.652,lng:139.828,station:"新木場駅 徒歩13分",desc:"大きなガラス温室でジャングル探検。雨でも南国気分。",pref:"t23"},
+ {id:"wakasu",name:"若洲海浜公園",short:"若洲公園",emoji:"🚴",cat:"park",indoor:false,budget:0,ages:[1,1,1],walk:null,lat:35.636,lng:139.833,station:"新木場駅からバス",desc:"ゲートブリッジのたもと。サイクリングや釣り、大型遊具も。",pref:"t23"},
+ {id:"kasairinkai",name:"葛西臨海水族園",short:"葛西水族園",emoji:"🐧",cat:"water",indoor:true,budget:1,ages:[1,1,1],walk:5,lat:35.642,lng:139.863,station:"葛西臨海公園駅 徒歩5分",desc:"マグロがぐるぐる回る大水槽とペンギンの群れ。",pref:"t23"},
+ {id:"ferris",name:"葛西臨海公園・大観覧車",short:"大観覧車",emoji:"🎡",cat:"play",indoor:false,budget:1,ages:[1,1,1],walk:7,lat:35.646,lng:139.859,station:"葛西臨海公園駅 徒歩7分",desc:"日本最大級の観覧車から東京湾を一望。芝生と海べの散歩も。",pref:"t23"},
+ {id:"chikahaku",name:"地下鉄博物館",short:"地下鉄博物館",emoji:"🚇",cat:"museum",indoor:true,budget:1,ages:[1,1,1],walk:1,lat:35.664,lng:139.873,station:"葛西駅 高架下すぐ",desc:"本物の車両と運転シミュレーター。コスパ最強の鉄道館。",pref:"t23"},
+ {id:"kameido",name:"亀戸天神社",short:"亀戸天神",emoji:"⛩️",cat:"park",indoor:false,budget:0,ages:[1,1,1],walk:13,lat:35.703,lng:139.827,station:"亀戸駅 徒歩13分",desc:"太鼓橋とスカイツリーの共演。参道でくず餅も。",pref:"t23"},
+ {id:"kinshi",name:"錦糸公園",short:"錦糸公園",emoji:"🌸",cat:"park",indoor:false,budget:0,ages:[1,1,1],walk:5,lat:35.697,lng:139.815,station:"錦糸町駅 徒歩5分",desc:"タコの遊具と噴水広場。となりのモールで雨宿りもできる。",pref:"t23"},
+ {id:"sumida",name:"すみだ水族館",short:"すみだ水族",emoji:"🐠",cat:"water",indoor:true,budget:3,ages:[1,1,1],walk:1,lat:35.710,lng:139.8105,station:"とうきょうスカイツリー駅すぐ",desc:"ソラマチの中。屋内開放型のペンギンプールを間近で。",pref:"t23"},
+ {id:"skytree",name:"東京スカイツリー展望台",short:"スカイツリー",emoji:"🗼",cat:"play",indoor:true,budget:3,ages:[1,1,1],walk:1,lat:35.7135,lng:139.807,station:"押上駅 直結",desc:"高さ350mの大パノラマ。ソラマチとセットで一日コース。",pref:"t23"},
+ {id:"komatsugawa",name:"大島小松川公園",short:"小松川公園",emoji:"🎢",cat:"park",indoor:false,budget:0,ages:[1,1,1],walk:3,lat:35.687,lng:139.848,station:"東大島駅 徒歩3分",desc:"荒川ぞいの大型公園。ロング滑り台とBBQ場が名物。",pref:"t23"},
+ {id:"ueno_zoo",name:"上野動物園",short:"上野動物園",emoji:"🐼",cat:"park",indoor:false,budget:1,ages:[1,1,1],walk:5,lat:35.716,lng:139.771,station:"上野駅 徒歩5分",desc:"パンダでおなじみ日本最古の動物園。中学生以下は無料。",pref:"t23"},
+ {id:"kahaku",name:"国立科学博物館",short:"科博",emoji:"🦖",cat:"museum",indoor:true,budget:1,ages:[1,1,1],walk:5,lat:35.719,lng:139.7765,station:"上野駅 徒歩5分",desc:"恐竜の全身骨格に大興奮。「親と子のたんけんひろば」も。",pref:"t23"},
+ {id:"shinagawa_aq",name:"しながわ水族館",short:"しながわ水",emoji:"🐬",cat:"water",indoor:true,budget:2,ages:[1,1,1],walk:8,lat:35.588,lng:139.737,station:"大森海岸駅 徒歩8分",desc:"イルカショーが間近で見られる。公園併設でお弁当も。",pref:"t23"},
+ {id:"yoyogi",name:"代々木公園",short:"代々木公園",emoji:"🌳",cat:"park",indoor:false,budget:0,ages:[1,1,1],walk:3,lat:35.671,lng:139.696,station:"原宿駅 徒歩3分",desc:"広大な芝生とサイクリングコース。ピクニックの聖地。",pref:"t23"},
+ {id:"asukayama",name:"飛鳥山公園",short:"飛鳥山公園",emoji:"🚂",cat:"park",indoor:false,budget:0,ages:[1,1,1],walk:1,lat:35.750,lng:139.738,station:"王子駅 徒歩1分",desc:"SLと都電の展示車両に乗れる。ミニモノレールも無料。",pref:"t23"},
+ {id:"sunshine_aq",name:"サンシャイン水族館",short:"サンシャイン",emoji:"🐡",cat:"water",indoor:true,budget:3,ages:[1,1,1],walk:10,lat:35.729,lng:139.719,station:"池袋駅 徒歩10分",desc:"頭上をペンギンが飛ぶ「天空のペンギン」が名物。",pref:"t23"},
+ {id:"toy_museum",name:"東京おもちゃ美術館",short:"おもちゃ美",emoji:"🧸",cat:"museum",indoor:true,budget:2,ages:[1,1,1],walk:7,lat:35.689,lng:139.722,station:"四谷三丁目駅 徒歩7分",desc:"木のおもちゃで一日遊べる。0〜2歳専用の赤ちゃん木育ひろばも。",pref:"t23"},
  /* ---- 東京・多摩 ---- */
- {id:"inokashira",name:"井の頭自然文化園",short:"井の頭",emoji:"🐿️",cat:"park",indoor:false,budget:1,ages:[1,1,1],lat:35.700,lng:139.573,station:"吉祥寺駅 徒歩10分",desc:"リスの小径とミニ遊園地。井の頭公園でボートもセットで。",pref:"tama"},
- {id:"tamazoo",name:"多摩動物公園",short:"多摩動物園",emoji:"🦁",cat:"park",indoor:false,budget:1,ages:[1,1,1],lat:35.649,lng:139.404,station:"多摩動物公園駅すぐ",desc:"広い丘の動物園。昆虫園の放し飼い温室は蝶だらけ。",pref:"tama"},
- {id:"puroland",name:"サンリオピューロランド",short:"ピューロ",emoji:"🎀",cat:"play",indoor:true,budget:3,ages:[1,1,1],lat:35.625,lng:139.429,station:"多摩センター駅 徒歩5分",desc:"全天候型のキャラクターテーマパーク。パレードは必見。",pref:"tama"},
- {id:"showakinen",name:"国営昭和記念公園",short:"昭和記念",emoji:"🌻",cat:"park",indoor:false,budget:1,ages:[1,1,1],lat:35.705,lng:139.396,station:"西立川駅 徒歩2分",desc:"巨大トランポリンと霧の森。レンタサイクルで一日遊べる。",pref:"tama"},
- {id:"keio_rail",name:"京王れーるランド",short:"れーるランド",emoji:"🚃",cat:"museum",indoor:true,budget:1,ages:[1,1,1],lat:35.655,lng:139.446,station:"多摩動物公園駅すぐ",desc:"運転体験にアスレチック。電車好きキッズの聖地。",pref:"tama"},
- {id:"takao",name:"高尾山",short:"高尾山",emoji:"⛰️",cat:"park",indoor:false,budget:2,ages:[0,1,1],lat:35.625,lng:139.243,station:"高尾山口駅",desc:"リフトとケーブルカーで気軽に登れる、はじめての山登りに。",pref:"tama"},
+ {id:"inokashira",name:"井の頭自然文化園",short:"井の頭",emoji:"🐿️",cat:"park",indoor:false,budget:1,ages:[1,1,1],walk:10,lat:35.700,lng:139.573,station:"吉祥寺駅 徒歩10分",desc:"リスの小径とミニ遊園地。井の頭公園でボートもセットで。",pref:"tama"},
+ {id:"tamazoo",name:"多摩動物公園",short:"多摩動物園",emoji:"🦁",cat:"park",indoor:false,budget:1,ages:[1,1,1],walk:1,lat:35.649,lng:139.404,station:"多摩動物公園駅すぐ",desc:"広い丘の動物園。昆虫園の放し飼い温室は蝶だらけ。",pref:"tama"},
+ {id:"puroland",name:"サンリオピューロランド",short:"ピューロ",emoji:"🎀",cat:"play",indoor:true,budget:3,ages:[1,1,1],walk:5,lat:35.625,lng:139.429,station:"多摩センター駅 徒歩5分",desc:"全天候型のキャラクターテーマパーク。パレードは必見。",pref:"tama"},
+ {id:"showakinen",name:"国営昭和記念公園",short:"昭和記念",emoji:"🌻",cat:"park",indoor:false,budget:1,ages:[1,1,1],walk:2,lat:35.705,lng:139.396,station:"西立川駅 徒歩2分",desc:"巨大トランポリンと霧の森。レンタサイクルで一日遊べる。",pref:"tama"},
+ {id:"keio_rail",name:"京王れーるランド",short:"れーるランド",emoji:"🚃",cat:"museum",indoor:true,budget:1,ages:[1,1,1],walk:1,lat:35.655,lng:139.446,station:"多摩動物公園駅すぐ",desc:"運転体験にアスレチック。電車好きキッズの聖地。",pref:"tama"},
+ {id:"takao",name:"高尾山",short:"高尾山",emoji:"⛰️",cat:"park",indoor:false,budget:2,ages:[0,1,1],walk:3,lat:35.625,lng:139.243,station:"高尾山口駅",desc:"リフトとケーブルカーで気軽に登れる、はじめての山登りに。",pref:"tama"},
  /* ---- 神奈川 ---- */
- {id:"anpanman",name:"横浜アンパンマンこどもミュージアム",short:"アンパンマン",emoji:"🍞",cat:"play",indoor:true,budget:3,ages:[1,1,0],lat:35.462,lng:139.630,station:"新高島駅 徒歩3分",desc:"小さい子の夢の国。ショーの時間は要チェック。",pref:"kanagawa"},
- {id:"cupnoodle",name:"カップヌードルミュージアム 横浜",short:"カップヌードル",emoji:"🍜",cat:"museum",indoor:true,budget:1,ages:[0,1,1],lat:35.454,lng:139.638,station:"みなとみらい駅 徒歩8分",desc:"マイカップヌードル作りが大人気。ネット予約がおすすめ。",pref:"kanagawa"},
- {id:"hakkeijima",name:"横浜・八景島シーパラダイス",short:"八景島",emoji:"🐬",cat:"play",indoor:false,budget:3,ages:[1,1,1],lat:35.337,lng:139.648,station:"八景島駅すぐ",desc:"水族館＋遊園地の島。入島だけなら無料なのもうれしい。",pref:"kanagawa"},
- {id:"zoorasia",name:"よこはま動物園ズーラシア",short:"ズーラシア",emoji:"🦓",cat:"park",indoor:false,budget:1,ages:[1,1,1],lat:35.494,lng:139.525,station:"中山駅からバス",desc:"世界の気候帯をめぐる広大な動物園。オカピに会える。",pref:"kanagawa"},
- {id:"nogeyama",name:"野毛山動物園",short:"野毛山",emoji:"🦒",cat:"park",indoor:false,budget:0,ages:[1,1,1],lat:35.443,lng:139.623,station:"桜木町駅 徒歩15分",desc:"入園無料でキリンやペンギン。ふれあいコーナーも人気。",pref:"kanagawa"},
- {id:"enosui",name:"新江ノ島水族館",short:"えのすい",emoji:"🐢",cat:"water",indoor:true,budget:3,ages:[1,1,1],lat:35.301,lng:139.480,station:"片瀬江ノ島駅 徒歩3分",desc:"相模湾の大水槽とクラゲの幻想空間。海も目の前。",pref:"kanagawa"},
- {id:"kodomonokuni",name:"こどもの国（横浜）",short:"こどもの国",emoji:"🐄",cat:"park",indoor:false,budget:1,ages:[1,1,1],lat:35.575,lng:139.492,station:"こどもの国駅すぐ",desc:"牧場・ポニー・110mのローラー滑り台。丸一日遊べる緑の丘。",pref:"kanagawa"},
- {id:"densha_bus",name:"電車とバスの博物館",short:"電バス博物館",emoji:"🚌",cat:"museum",indoor:true,budget:1,ages:[1,1,1],lat:35.578,lng:139.596,station:"宮崎台駅 直結",desc:"シミュレーター充実で入館200円。雨の日の救世主。",pref:"kanagawa"},
- {id:"fujiko",name:"藤子・F・不二雄ミュージアム",short:"藤子F美術館",emoji:"🚪",cat:"museum",indoor:true,budget:2,ages:[0,1,1],lat:35.616,lng:139.585,station:"登戸駅からバス",desc:"原画と屋上のはらっぱ。日時指定の完全予約制。",pref:"kanagawa"},
- {id:"chokoku",name:"箱根 彫刻の森美術館",short:"彫刻の森",emoji:"🎪",cat:"museum",indoor:false,budget:3,ages:[1,1,1],lat:35.245,lng:139.051,station:"彫刻の森駅 徒歩2分",desc:"アートの中を駆け回れる野外美術館。ネットの森と足湯も。",pref:"kanagawa"},
- {id:"kawasui",name:"カワスイ 川崎水族館",short:"カワスイ",emoji:"🐟",cat:"water",indoor:true,budget:3,ages:[1,1,1],lat:35.531,lng:139.697,station:"川崎駅 徒歩1分",desc:"駅前ビルの中で世界の川を旅する水族館。夜の顔も。",pref:"kanagawa"},
- {id:"seimei",name:"生命の星・地球博物館",short:"地球博物館",emoji:"🦕",cat:"museum",indoor:true,budget:1,ages:[1,1,1],lat:35.238,lng:139.122,station:"入生田駅 徒歩3分",desc:"恐竜と隕石の大展示。箱根の行き帰りに寄りたい。",pref:"kanagawa"},
+ {id:"anpanman",name:"横浜アンパンマンこどもミュージアム",short:"アンパンマン",emoji:"🍞",cat:"play",indoor:true,budget:3,ages:[1,1,0],walk:3,lat:35.462,lng:139.630,station:"新高島駅 徒歩3分",desc:"小さい子の夢の国。ショーの時間は要チェック。",pref:"kanagawa"},
+ {id:"cupnoodle",name:"カップヌードルミュージアム 横浜",short:"カップヌードル",emoji:"🍜",cat:"museum",indoor:true,budget:1,ages:[0,1,1],walk:8,lat:35.454,lng:139.638,station:"みなとみらい駅 徒歩8分",desc:"マイカップヌードル作りが大人気。ネット予約がおすすめ。",pref:"kanagawa"},
+ {id:"hakkeijima",name:"横浜・八景島シーパラダイス",short:"八景島",emoji:"🐬",cat:"play",indoor:false,budget:3,ages:[1,1,1],walk:1,lat:35.337,lng:139.648,station:"八景島駅すぐ",desc:"水族館＋遊園地の島。入島だけなら無料なのもうれしい。",pref:"kanagawa"},
+ {id:"zoorasia",name:"よこはま動物園ズーラシア",short:"ズーラシア",emoji:"🦓",cat:"park",indoor:false,budget:1,ages:[1,1,1],walk:null,lat:35.494,lng:139.525,station:"中山駅からバス",desc:"世界の気候帯をめぐる広大な動物園。オカピに会える。",pref:"kanagawa"},
+ {id:"nogeyama",name:"野毛山動物園",short:"野毛山",emoji:"🦒",cat:"park",indoor:false,budget:0,ages:[1,1,1],walk:15,lat:35.443,lng:139.623,station:"桜木町駅 徒歩15分",desc:"入園無料でキリンやペンギン。ふれあいコーナーも人気。",pref:"kanagawa"},
+ {id:"enosui",name:"新江ノ島水族館",short:"えのすい",emoji:"🐢",cat:"water",indoor:true,budget:3,ages:[1,1,1],walk:3,lat:35.301,lng:139.480,station:"片瀬江ノ島駅 徒歩3分",desc:"相模湾の大水槽とクラゲの幻想空間。海も目の前。",pref:"kanagawa"},
+ {id:"kodomonokuni",name:"こどもの国（横浜）",short:"こどもの国",emoji:"🐄",cat:"park",indoor:false,budget:1,ages:[1,1,1],walk:1,lat:35.575,lng:139.492,station:"こどもの国駅すぐ",desc:"牧場・ポニー・110mのローラー滑り台。丸一日遊べる緑の丘。",pref:"kanagawa"},
+ {id:"densha_bus",name:"電車とバスの博物館",short:"電バス博物館",emoji:"🚌",cat:"museum",indoor:true,budget:1,ages:[1,1,1],walk:1,lat:35.578,lng:139.596,station:"宮崎台駅 直結",desc:"シミュレーター充実で入館200円。雨の日の救世主。",pref:"kanagawa"},
+ {id:"fujiko",name:"藤子・F・不二雄ミュージアム",short:"藤子F美術館",emoji:"🚪",cat:"museum",indoor:true,budget:2,ages:[0,1,1],walk:null,lat:35.616,lng:139.585,station:"登戸駅からバス",desc:"原画と屋上のはらっぱ。日時指定の完全予約制。",pref:"kanagawa"},
+ {id:"chokoku",name:"箱根 彫刻の森美術館",short:"彫刻の森",emoji:"🎪",cat:"museum",indoor:false,budget:3,ages:[1,1,1],walk:2,lat:35.245,lng:139.051,station:"彫刻の森駅 徒歩2分",desc:"アートの中を駆け回れる野外美術館。ネットの森と足湯も。",pref:"kanagawa"},
+ {id:"kawasui",name:"カワスイ 川崎水族館",short:"カワスイ",emoji:"🐟",cat:"water",indoor:true,budget:3,ages:[1,1,1],walk:1,lat:35.531,lng:139.697,station:"川崎駅 徒歩1分",desc:"駅前ビルの中で世界の川を旅する水族館。夜の顔も。",pref:"kanagawa"},
+ {id:"seimei",name:"生命の星・地球博物館",short:"地球博物館",emoji:"🦕",cat:"museum",indoor:true,budget:1,ages:[1,1,1],walk:3,lat:35.238,lng:139.122,station:"入生田駅 徒歩3分",desc:"恐竜と隕石の大展示。箱根の行き帰りに寄りたい。",pref:"kanagawa"},
  /* ---- 千葉 ---- */
- {id:"ikspiari",name:"イクスピアリ",short:"イクスピアリ",emoji:"🎬",cat:"shop",indoor:true,budget:0,ages:[1,1,1],lat:35.639,lng:139.884,station:"舞浜駅 徒歩1分",desc:"舞浜駅前のモール。映画館・キッズショップで雨の日も安心。",pref:"chiba"},
- {id:"kotsukoen",name:"浦安市交通公園",short:"交通公園",emoji:"🚲",cat:"play",indoor:false,budget:0,ages:[1,1,1],lat:35.6495,lng:139.9035,station:"浦安駅からバス",desc:"ゴーカートや変わり種自転車、ポニーまで無料の穴場。",pref:"chiba"},
- {id:"disney",name:"東京ディズニーリゾート",short:"ディズニー",emoji:"🏰",cat:"play",indoor:false,budget:3,ages:[1,1,1],lat:35.634,lng:139.879,station:"舞浜駅すぐ",desc:"説明不要の夢の国。ランドとシー、一日じゃ足りない。",pref:"chiba"},
- {id:"andersen",name:"ふなばしアンデルセン公園",short:"アンデルセン",emoji:"🌷",cat:"park",indoor:false,budget:1,ages:[1,1,1],lat:35.744,lng:140.028,station:"新京成三咲駅からバス",desc:"全国区の人気公園。アスレチックと動物ふれあい、じゃぶじゃぶ池。",pref:"chiba"},
- {id:"chiba_zoo",name:"千葉市動物公園",short:"千葉動物園",emoji:"🐒",cat:"park",indoor:false,budget:1,ages:[1,1,1],lat:35.646,lng:140.129,station:"動物公園駅すぐ",desc:"立ち姿のレッサーパンダで有名。ふれあい動物の里も。",pref:"chiba"},
- {id:"kamogawa",name:"鴨川シーワールド",short:"鴨シー",emoji:"🐋",cat:"water",indoor:false,budget:3,ages:[1,1,1],lat:35.116,lng:140.113,station:"安房鴨川駅から送迎バス",desc:"シャチのド迫力ショー。ぬれる覚悟で最前列へ。",pref:"chiba"},
- {id:"mother",name:"マザー牧場",short:"マザー牧場",emoji:"🐑",cat:"park",indoor:false,budget:3,ages:[1,1,1],lat:35.318,lng:139.956,station:"君津駅からバス",desc:"ひつじの大行進とこぶたのレース。ソフトクリームは必食。",pref:"chiba"},
- {id:"german",name:"東京ドイツ村",short:"ドイツ村",emoji:"🎡",cat:"park",indoor:false,budget:2,ages:[1,1,1],lat:35.348,lng:140.045,station:"袖ケ浦駅からバス(車推奨)",desc:"広大な芝生とミニ遊園地。冬は関東三大イルミネーション。",pref:"chiba"},
- {id:"koku_kagaku",name:"航空科学博物館",short:"航空科学博",emoji:"✈️",cat:"museum",indoor:true,budget:1,ages:[1,1,1],lat:35.766,lng:140.407,station:"成田空港近く(車推奨)",desc:"ジャンボのコックピットに座れる。成田の離着陸も間近。",pref:"chiba"},
- {id:"shimizu",name:"清水公園",short:"清水公園",emoji:"🌲",cat:"park",indoor:false,budget:2,ages:[0,1,1],lat:35.965,lng:139.867,station:"清水公園駅 徒歩10分",desc:"水上コースもある日本最大級のフィールドアスレチック。",pref:"chiba"},
+ {id:"ikspiari",name:"イクスピアリ",short:"イクスピアリ",emoji:"🎬",cat:"shop",indoor:true,budget:0,ages:[1,1,1],walk:1,lat:35.639,lng:139.884,station:"舞浜駅 徒歩1分",desc:"舞浜駅前のモール。映画館・キッズショップで雨の日も安心。",pref:"chiba"},
+ {id:"kotsukoen",name:"浦安市交通公園",short:"交通公園",emoji:"🚲",cat:"play",indoor:false,budget:0,ages:[1,1,1],walk:null,lat:35.6495,lng:139.9035,station:"浦安駅からバス",desc:"ゴーカートや変わり種自転車、ポニーまで無料の穴場。",pref:"chiba"},
+ {id:"disney",name:"東京ディズニーリゾート",short:"ディズニー",emoji:"🏰",cat:"play",indoor:false,budget:3,ages:[1,1,1],walk:1,lat:35.634,lng:139.879,station:"舞浜駅すぐ",desc:"説明不要の夢の国。ランドとシー、一日じゃ足りない。",pref:"chiba"},
+ {id:"andersen",name:"ふなばしアンデルセン公園",short:"アンデルセン",emoji:"🌷",cat:"park",indoor:false,budget:1,ages:[1,1,1],walk:null,lat:35.744,lng:140.028,station:"新京成三咲駅からバス",desc:"全国区の人気公園。アスレチックと動物ふれあい、じゃぶじゃぶ池。",pref:"chiba"},
+ {id:"chiba_zoo",name:"千葉市動物公園",short:"千葉動物園",emoji:"🐒",cat:"park",indoor:false,budget:1,ages:[1,1,1],walk:1,lat:35.646,lng:140.129,station:"動物公園駅すぐ",desc:"立ち姿のレッサーパンダで有名。ふれあい動物の里も。",pref:"chiba"},
+ {id:"kamogawa",name:"鴨川シーワールド",short:"鴨シー",emoji:"🐋",cat:"water",indoor:false,budget:3,ages:[1,1,1],walk:null,lat:35.116,lng:140.113,station:"安房鴨川駅から送迎バス",desc:"シャチのド迫力ショー。ぬれる覚悟で最前列へ。",pref:"chiba"},
+ {id:"mother",name:"マザー牧場",short:"マザー牧場",emoji:"🐑",cat:"park",indoor:false,budget:3,ages:[1,1,1],walk:null,lat:35.318,lng:139.956,station:"君津駅からバス",desc:"ひつじの大行進とこぶたのレース。ソフトクリームは必食。",pref:"chiba"},
+ {id:"german",name:"東京ドイツ村",short:"ドイツ村",emoji:"🎡",cat:"park",indoor:false,budget:2,ages:[1,1,1],walk:null,lat:35.348,lng:140.045,station:"袖ケ浦駅からバス(車推奨)",desc:"広大な芝生とミニ遊園地。冬は関東三大イルミネーション。",pref:"chiba"},
+ {id:"koku_kagaku",name:"航空科学博物館",short:"航空科学博",emoji:"✈️",cat:"museum",indoor:true,budget:1,ages:[1,1,1],walk:null,lat:35.766,lng:140.407,station:"成田空港近く(車推奨)",desc:"ジャンボのコックピットに座れる。成田の離着陸も間近。",pref:"chiba"},
+ {id:"shimizu",name:"清水公園",short:"清水公園",emoji:"🌲",cat:"park",indoor:false,budget:2,ages:[0,1,1],walk:10,lat:35.965,lng:139.867,station:"清水公園駅 徒歩10分",desc:"水上コースもある日本最大級のフィールドアスレチック。",pref:"chiba"},
  /* ---- 埼玉 ---- */
- {id:"teppaku",name:"鉄道博物館",short:"てっぱく",emoji:"🚄",cat:"museum",indoor:true,budget:2,ages:[1,1,1],lat:35.921,lng:139.617,station:"鉄道博物館駅すぐ",desc:"実物車両がずらり。運転シミュレーターは早めに整理券を。",pref:"saitama"},
- {id:"tobu_zoo",name:"東武動物公園",short:"東武動物園",emoji:"🎢",cat:"play",indoor:false,budget:3,ages:[1,1,1],lat:36.026,lng:139.710,station:"東武動物公園駅からバス",desc:"動物園＋遊園地のハイブリッド。ホワイトタイガーも。",pref:"saitama"},
- {id:"moomin",name:"ムーミンバレーパーク",short:"ムーミン",emoji:"🌲",cat:"play",indoor:false,budget:3,ages:[1,1,1],lat:35.878,lng:139.336,station:"飯能駅からバス",desc:"北欧の森の物語世界。手前のメッツァビレッジは入場無料。",pref:"saitama"},
- {id:"kodomo_shizen",name:"埼玉県こども動物自然公園",short:"こども動物園",emoji:"🐨",cat:"park",indoor:false,budget:1,ages:[1,1,1],lat:36.010,lng:139.400,station:"高坂駅からバス",desc:"コアラとカピバラ温泉。丘いっぱいにひろがる動物園。",pref:"saitama"},
- {id:"tokorozawa",name:"所沢航空記念公園",short:"航空公園",emoji:"✈️",cat:"park",indoor:false,budget:0,ages:[1,1,1],lat:35.797,lng:139.466,station:"航空公園駅すぐ",desc:"本物の飛行機が並ぶ広い公園。日本の航空発祥の地。",pref:"saitama"},
- {id:"shinrin",name:"国営武蔵丘陵森林公園",short:"森林公園",emoji:"🚴",cat:"park",indoor:false,budget:1,ages:[1,1,1],lat:36.056,lng:139.373,station:"森林公園駅からバス",desc:"日本一大きいエアトランポリン「ぽんぽこマウンテン」。",pref:"saitama"},
- {id:"kawagoe",name:"川越・小江戸さんぽ",short:"川越",emoji:"🏮",cat:"park",indoor:false,budget:0,ages:[0,1,1],lat:35.925,lng:139.482,station:"川越駅 徒歩20分",desc:"蔵造りの町並みと菓子屋横丁で食べ歩き。",pref:"saitama"},
- {id:"nagatoro",name:"長瀞ライン下り",short:"長瀞",emoji:"🚣",cat:"play",indoor:false,budget:3,ages:[0,1,1],lat:36.094,lng:139.114,station:"長瀞駅 徒歩2分",desc:"船頭さんの竿さばきで岩畳の渓谷をくだる。",pref:"saitama"},
+ {id:"teppaku",name:"鉄道博物館",short:"てっぱく",emoji:"🚄",cat:"museum",indoor:true,budget:2,ages:[1,1,1],walk:1,lat:35.921,lng:139.617,station:"鉄道博物館駅すぐ",desc:"実物車両がずらり。運転シミュレーターは早めに整理券を。",pref:"saitama"},
+ {id:"tobu_zoo",name:"東武動物公園",short:"東武動物園",emoji:"🎢",cat:"play",indoor:false,budget:3,ages:[1,1,1],walk:10,lat:36.026,lng:139.710,station:"東武動物公園駅 徒歩10分",desc:"動物園＋遊園地のハイブリッド。ホワイトタイガーも。",pref:"saitama"},
+ {id:"moomin",name:"ムーミンバレーパーク",short:"ムーミン",emoji:"🌲",cat:"play",indoor:false,budget:3,ages:[1,1,1],walk:null,lat:35.878,lng:139.336,station:"飯能駅からバス",desc:"北欧の森の物語世界。手前のメッツァビレッジは入場無料。",pref:"saitama"},
+ {id:"kodomo_shizen",name:"埼玉県こども動物自然公園",short:"こども動物園",emoji:"🐨",cat:"park",indoor:false,budget:1,ages:[1,1,1],walk:null,lat:36.010,lng:139.400,station:"高坂駅からバス",desc:"コアラとカピバラ温泉。丘いっぱいにひろがる動物園。",pref:"saitama"},
+ {id:"tokorozawa",name:"所沢航空記念公園",short:"航空公園",emoji:"✈️",cat:"park",indoor:false,budget:0,ages:[1,1,1],walk:1,lat:35.797,lng:139.466,station:"航空公園駅すぐ",desc:"本物の飛行機が並ぶ広い公園。日本の航空発祥の地。",pref:"saitama"},
+ {id:"shinrin",name:"国営武蔵丘陵森林公園",short:"森林公園",emoji:"🚴",cat:"park",indoor:false,budget:1,ages:[1,1,1],walk:null,lat:36.056,lng:139.373,station:"森林公園駅からバス",desc:"日本一大きいエアトランポリン「ぽんぽこマウンテン」。",pref:"saitama"},
+ {id:"kawagoe",name:"川越・小江戸さんぽ",short:"川越",emoji:"🏮",cat:"park",indoor:false,budget:0,ages:[0,1,1],walk:20,lat:35.925,lng:139.482,station:"川越駅 徒歩20分",desc:"蔵造りの町並みと菓子屋横丁で食べ歩き。",pref:"saitama"},
+ {id:"nagatoro",name:"長瀞ライン下り",short:"長瀞",emoji:"🚣",cat:"play",indoor:false,budget:3,ages:[0,1,1],walk:2,lat:36.094,lng:139.114,station:"長瀞駅 徒歩2分",desc:"船頭さんの竿さばきで岩畳の渓谷をくだる。",pref:"saitama"},
  /* ---- 茨城 ---- */
- {id:"hitachi_kaihin",name:"国営ひたち海浜公園",short:"ひたち海浜",emoji:"🌺",cat:"park",indoor:false,budget:1,ages:[1,1,1],lat:36.401,lng:140.591,station:"勝田駅からバス",desc:"ネモフィラの丘で有名。遊園地プレジャーガーデンも。",pref:"ibaraki"},
- {id:"aquaworld",name:"アクアワールド茨城県大洗水族館",short:"大洗水族館",emoji:"🦈",cat:"water",indoor:true,budget:3,ages:[1,1,1],lat:36.320,lng:140.577,station:"大洗駅からバス",desc:"サメの飼育数日本一。マンボウもいる大型水族館。",pref:"ibaraki"},
- {id:"expo",name:"つくばエキスポセンター",short:"エキスポ",emoji:"🚀",cat:"museum",indoor:true,budget:1,ages:[1,1,1],lat:36.085,lng:140.112,station:"つくば駅 徒歩5分",desc:"実物大H-IIロケットが目印。世界最大級のプラネタリウム。",pref:"ibaraki"},
- {id:"jaxa",name:"JAXA筑波宇宙センター",short:"JAXA",emoji:"🛰️",cat:"museum",indoor:true,budget:0,ages:[1,1,1],lat:36.065,lng:140.129,station:"つくば駅からバス",desc:"本物の宇宙機がずらり。見学無料の宇宙基地。",pref:"ibaraki"},
+ {id:"hitachi_kaihin",name:"国営ひたち海浜公園",short:"ひたち海浜",emoji:"🌺",cat:"park",indoor:false,budget:1,ages:[1,1,1],walk:null,lat:36.401,lng:140.591,station:"勝田駅からバス",desc:"ネモフィラの丘で有名。遊園地プレジャーガーデンも。",pref:"ibaraki"},
+ {id:"aquaworld",name:"アクアワールド茨城県大洗水族館",short:"大洗水族館",emoji:"🦈",cat:"water",indoor:true,budget:3,ages:[1,1,1],walk:null,lat:36.320,lng:140.577,station:"大洗駅からバス",desc:"サメの飼育数日本一。マンボウもいる大型水族館。",pref:"ibaraki"},
+ {id:"expo",name:"つくばエキスポセンター",short:"エキスポ",emoji:"🚀",cat:"museum",indoor:true,budget:1,ages:[1,1,1],walk:5,lat:36.085,lng:140.112,station:"つくば駅 徒歩5分",desc:"実物大H-IIロケットが目印。世界最大級のプラネタリウム。",pref:"ibaraki"},
+ {id:"jaxa",name:"JAXA筑波宇宙センター",short:"JAXA",emoji:"🛰️",cat:"museum",indoor:true,budget:0,ages:[1,1,1],walk:null,lat:36.065,lng:140.129,station:"つくば駅からバス",desc:"本物の宇宙機がずらり。見学無料の宇宙基地。",pref:"ibaraki"},
  /* ---- 栃木 ---- */
- {id:"tobu_ws",name:"東武ワールドスクウェア",short:"世界一周",emoji:"🗽",cat:"play",indoor:false,budget:3,ages:[1,1,1],lat:36.795,lng:139.712,station:"東武ワールドスクウェア駅すぐ",desc:"世界の名建築102点を25分の1で再現。世界一周気分。",pref:"tochigi"},
- {id:"mibu_toy",name:"壬生町おもちゃ博物館",short:"おもちゃ博",emoji:"🧸",cat:"play",indoor:true,budget:1,ages:[1,1,1],lat:36.436,lng:139.788,station:"おもちゃのまち駅 徒歩15分",desc:"巨大な屋内遊具とおもちゃの部屋。となりに公園も。",pref:"tochigi"},
- {id:"oya",name:"大谷資料館",short:"大谷資料館",emoji:"⛏️",cat:"museum",indoor:true,budget:2,ages:[0,1,1],lat:36.632,lng:139.820,station:"宇都宮駅からバス",desc:"地下の巨大神殿のような採石場跡。夏もひんやり。",pref:"tochigi"},
- {id:"nasu_animal",name:"那須どうぶつ王国",short:"那須ど王国",emoji:"🦉",cat:"park",indoor:false,budget:3,ages:[1,1,1],lat:37.062,lng:140.008,station:"那須高原(車推奨)",desc:"カピバラの露天風呂とバードショー。高原の動物王国。",pref:"tochigi"},
+ {id:"tobu_ws",name:"東武ワールドスクウェア",short:"世界一周",emoji:"🗽",cat:"play",indoor:false,budget:3,ages:[1,1,1],walk:1,lat:36.795,lng:139.712,station:"東武ワールドスクウェア駅すぐ",desc:"世界の名建築102点を25分の1で再現。世界一周気分。",pref:"tochigi"},
+ {id:"mibu_toy",name:"壬生町おもちゃ博物館",short:"おもちゃ博",emoji:"🧸",cat:"play",indoor:true,budget:1,ages:[1,1,1],walk:15,lat:36.436,lng:139.788,station:"おもちゃのまち駅 徒歩15分",desc:"巨大な屋内遊具とおもちゃの部屋。となりに公園も。",pref:"tochigi"},
+ {id:"oya",name:"大谷資料館",short:"大谷資料館",emoji:"⛏️",cat:"museum",indoor:true,budget:2,ages:[0,1,1],walk:null,lat:36.632,lng:139.820,station:"宇都宮駅からバス",desc:"地下の巨大神殿のような採石場跡。夏もひんやり。",pref:"tochigi"},
+ {id:"nasu_animal",name:"那須どうぶつ王国",short:"那須ど王国",emoji:"🦉",cat:"park",indoor:false,budget:3,ages:[1,1,1],walk:null,lat:37.062,lng:140.008,station:"那須高原(車推奨)",desc:"カピバラの露天風呂とバードショー。高原の動物王国。",pref:"tochigi"},
  /* ---- 群馬 ---- */
- {id:"safari",name:"群馬サファリパーク",short:"サファリ",emoji:"🦁",cat:"park",indoor:false,budget:3,ages:[1,1,1],lat:36.238,lng:138.918,station:"上州富岡駅からタクシー",desc:"マイカーで猛獣エリアへ。エサやり体験バスがおすすめ。",pref:"gunma"},
- {id:"usui",name:"碓氷峠鉄道文化むら",short:"鉄道文化むら",emoji:"🚂",cat:"play",indoor:false,budget:1,ages:[1,1,1],lat:36.335,lng:138.727,station:"横川駅すぐ",desc:"引退した名車両がずらり。園内をトロッコ列車が走る。",pref:"gunma"},
- {id:"konnyaku",name:"こんにゃくパーク",short:"こんにゃく",emoji:"🍢",cat:"museum",indoor:true,budget:0,ages:[1,1,1],lat:36.257,lng:138.885,station:"上州福島駅からタクシー",desc:"無料の工場見学とこんにゃくバイキング。話のネタに。",pref:"gunma"},
- {id:"kiryu",name:"桐生が岡動物園・遊園地",short:"桐生が岡",emoji:"🎠",cat:"park",indoor:false,budget:0,ages:[1,1,1],lat:36.421,lng:139.328,station:"桐生駅 徒歩15分",desc:"動物園も遊園地も入園無料。乗り物は1回200円前後。",pref:"gunma"}
+ {id:"safari",name:"群馬サファリパーク",short:"サファリ",emoji:"🦁",cat:"park",indoor:false,budget:3,ages:[1,1,1],walk:null,lat:36.238,lng:138.918,station:"上州富岡駅からタクシー",desc:"マイカーで猛獣エリアへ。エサやり体験バスがおすすめ。",pref:"gunma"},
+ {id:"usui",name:"碓氷峠鉄道文化むら",short:"鉄道文化むら",emoji:"🚂",cat:"play",indoor:false,budget:1,ages:[1,1,1],walk:1,lat:36.335,lng:138.727,station:"横川駅すぐ",desc:"引退した名車両がずらり。園内をトロッコ列車が走る。",pref:"gunma"},
+ {id:"konnyaku",name:"こんにゃくパーク",short:"こんにゃく",emoji:"🍢",cat:"museum",indoor:true,budget:0,ages:[1,1,1],walk:null,lat:36.257,lng:138.885,station:"上州福島駅からタクシー",desc:"無料の工場見学とこんにゃくバイキング。話のネタに。",pref:"gunma"},
+ {id:"kiryu",name:"桐生が岡動物園・遊園地",short:"桐生が岡",emoji:"🎠",cat:"park",indoor:false,budget:0,ages:[1,1,1],walk:15,lat:36.421,lng:139.328,station:"桐生駅 徒歩15分",desc:"動物園も遊園地も入園無料。乗り物は1回200円前後。",pref:"gunma"}
 ];
 
 const CAT_COLOR = {park:"#3E9B63", museum:"#5B6ABF", water:"#3D9BC4", play:"#EF6461", shop:"#F49D37"};
 const BUDGET_LABEL = ["無料","〜1,000円","〜3,000円","3,000円〜"];
 const AGE_LABEL = ["0〜2歳","3〜5歳","6歳以上"];
-const PREFS = [["all","すべて"],["t23","東京23区"],["tama","東京・多摩"],["kanagawa","神奈川"],["chiba","千葉"],["saitama","埼玉"],["ibaraki","茨城"],["tochigi","栃木"],["gunma","群馬"]];
+const PREFS = [["all","すべて"],["near","📍 いまの場所の近く"],["t23","東京23区"],["tama","東京・多摩"],["kanagawa","神奈川"],["chiba","千葉"],["saitama","埼玉"],["ibaraki","茨城"],["tochigi","栃木"],["gunma","群馬"]];
 const PREF_LABEL = Object.fromEntries(PREFS);
 const WHEEL_COLORS = ["#FFE3A1","#CBE8D4","#F9D2E0","#C9E6F2","#FFF0C9","#DEDAF4"];
 const STORAGE_KEY = "odekake:visits";
@@ -464,6 +483,7 @@ const STORAGE_KEY = "odekake:visits";
 /* ================= 状態 ================= */
 let state = {
   area:"all", weather:"any", ages:[true,true,false], budget:3,
+  radius:5, walk:99, userLoc:null, locating:false,
   visits:[], currentSpot:null, wheelSpots:[],
   rotation:0, spinning:false, rating:"😆"
 };
@@ -486,9 +506,23 @@ function geoToXY(lat,lng){
   // lng 138.65〜140.95 → x 0〜600 / lat 37.10〜34.90 → y 0〜600
   return { x:(lng-138.65)/2.3*600, y:(37.10-lat)/2.2*600 };
 }
+function distKm(a,b){
+  const R=6371, toR=x=>x*Math.PI/180;
+  const dLat=toR(b.lat-a.lat), dLng=toR(b.lng-a.lng);
+  const h=Math.sin(dLat/2)**2 + Math.cos(toR(a.lat))*Math.cos(toR(b.lat))*Math.sin(dLng/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
 function filteredSpots(){
   return SPOTS.filter(s=>{
-    if(state.area!=="all" && s.pref!==state.area) return false;
+    if(state.area==="near"){
+      if(!state.userLoc) return false;
+      if(distKm(state.userLoc, s) > state.radius) return false;
+    }else if(state.area!=="all" && s.pref!==state.area){
+      return false;
+    }
+    if(state.area==="t23" && state.walk<99){
+      if(s.walk==null || s.walk>state.walk) return false;
+    }
     if(state.weather==="indoor" && !s.indoor) return false;
     if(s.budget > state.budget) return false;
     if(state.ages.some(Boolean)){
@@ -546,11 +580,71 @@ $("#budgetChips").addEventListener("click", e=>{
   state.budget = +b.dataset.budget;
   onFilterChange();
 });
+$("#radiusChips").addEventListener("click", e=>{
+  const b = e.target.closest(".chip"); if(!b) return;
+  document.querySelectorAll("#radiusChips .chip").forEach(c=>c.setAttribute("aria-pressed","false"));
+  b.setAttribute("aria-pressed","true");
+  state.radius = +b.dataset.radius;
+  onFilterChange();
+});
+$("#walkChips").addEventListener("click", e=>{
+  const b = e.target.closest(".chip"); if(!b) return;
+  document.querySelectorAll("#walkChips .chip").forEach(c=>c.setAttribute("aria-pressed","false"));
+  b.setAttribute("aria-pressed","true");
+  state.walk = +b.dataset.walk;
+  onFilterChange();
+});
+function syncAreaChips(){
+  document.querySelectorAll("#areaChips .chip").forEach(c=>
+    c.setAttribute("aria-pressed", String(c.dataset.area===state.area)));
+}
+function requestLocation(){
+  if(state.locating) return;
+  const note = $("#countNote");
+  if(!("geolocation" in navigator)){
+    state.area = "all"; syncAreaChips();
+    note.textContent = "この端末では位置情報が使えないようです";
+    note.classList.add("zero");
+    return;
+  }
+  state.locating = true;
+  note.textContent = "現在地を取得しています…";
+  note.classList.remove("zero");
+  buildWheel(); renderMap();
+  navigator.geolocation.getCurrentPosition(pos=>{
+    state.locating = false;
+    state.userLoc = {lat:pos.coords.latitude, lng:pos.coords.longitude};
+    if(state.area==="near"){
+      // 現在地周辺にマップをズーム
+      const u = geoToXY(state.userLoc.lat, state.userLoc.lng);
+      vb.w = vb.h = Math.max(45, state.radius*2.89*3.2);
+      vb.x = u.x - vb.w/2; vb.y = u.y - vb.h/2;
+      clampVB(); applyVB();
+    }
+    onFilterChange();
+  }, err=>{
+    state.locating = false;
+    state.area = "all"; syncAreaChips();
+    onFilterChange();
+    note.textContent = "現在地が取得できませんでした。設定で位置情報の許可をご確認ください";
+    note.classList.add("zero");
+  }, {enableHighAccuracy:false, timeout:12000, maximumAge:300000});
+}
 function onFilterChange(){
+  $("#radiusGroup").style.display = state.area==="near" ? "" : "none";
+  $("#walkGroup").style.display   = state.area==="t23"  ? "" : "none";
+  if(state.area!=="t23" && state.walk!==99){
+    state.walk = 99;
+    document.querySelectorAll("#walkChips .chip").forEach(c=>
+      c.setAttribute("aria-pressed", String(c.dataset.walk==="99")));
+  }
+  if(state.area==="near" && !state.userLoc){ requestLocation(); return; }
   const list = filteredSpots();
   const note = $("#countNote");
   if(list.length===0){
-    note.textContent = "条件にあうスポットがありません。すこしゆるめてみてください";
+    note.textContent = state.area==="near"
+      ? `現在地から${state.radius}km以内に条件にあうスポットがありません。距離をひろげてみてください`
+      : "条件にあうスポットがありません。すこしゆるめてみてください";
     note.classList.add("zero");
   }else{
     note.textContent = `いまの条件にあうのは ${list.length} スポット！`;
@@ -661,6 +755,7 @@ function showResult(spot){
   const v = visitedIds().has(spot.id);
   $("#resBadges").innerHTML = `
     <span class="badge">📍 ${PREF_LABEL[spot.pref]||""}</span>
+    ${state.userLoc? `<span class="badge">📏 約${distKm(state.userLoc,spot).toFixed(1)}km</span>`:""}
     <span class="badge ${spot.indoor?'b-in':'b-out'}">${spot.indoor?'☔ 雨でも安心':'☀️ 屋外メイン'}</span>
     <span class="badge b-budget">💰 ${BUDGET_LABEL[spot.budget]}</span>
     <span class="badge">🎈 ${spot.ages.map((ok,i)=>ok?AGE_LABEL[i]:null).filter(Boolean).join("・")}</span>
@@ -720,6 +815,18 @@ function renderMap(){
   const okIds = new Set(filteredSpots().map(s=>s.id));
   const vIds = visitedIds();
   let html = "";
+  if(state.userLoc){
+    const u = geoToXY(state.userLoc.lat, state.userLoc.lng);
+    if(state.area==="near"){
+      html += `<ellipse cx="${u.x.toFixed(1)}" cy="${u.y.toFixed(1)}" rx="${(state.radius*2.89).toFixed(1)}" ry="${(state.radius*2.46).toFixed(1)}"
+        fill="#2F80ED" opacity=".10" stroke="#2F80ED" stroke-width="1" stroke-dasharray="4 3"/>`;
+    }
+    html += `<g class="pin" data-x="${u.x.toFixed(1)}" data-y="${u.y.toFixed(1)}" style="pointer-events:none">
+      <circle cx="0" cy="0" r="11" fill="#2F80ED" opacity=".22"/>
+      <circle cx="0" cy="0" r="6" fill="#2F80ED" stroke="#fff" stroke-width="2.5"/>
+      <text class="pin-label" x="0" y="21" text-anchor="middle" font-size="8" font-weight="700">いまここ</text>
+    </g>`;
+  }
   SPOTS.forEach(s=>{
     const {x,y} = geoToXY(s.lat,s.lng);
     const dim = okIds.has(s.id) ? "" : "dim";
@@ -753,6 +860,7 @@ function showMapInfo(id){
     <div class="result-name"><span class="emoji">${s.emoji}</span>${esc(s.name)} ${v?"⭐":""}</div>
     <div class="badges">
       <span class="badge">📍 ${PREF_LABEL[s.pref]||""}</span>
+      ${state.userLoc? `<span class="badge">📏 約${distKm(state.userLoc,s).toFixed(1)}km</span>`:""}
       <span class="badge ${s.indoor?'b-in':'b-out'}">${s.indoor?'☔ 雨でも安心':'☀️ 屋外メイン'}</span>
       <span class="badge b-budget">💰 ${BUDGET_LABEL[s.budget]}</span>
       <span class="badge">🚉 ${esc(s.station)}</span>
